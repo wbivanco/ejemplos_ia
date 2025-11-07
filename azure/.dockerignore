@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+
+# Entorno
+.env
+.env.local
+
+# Base de datos local
+*.db
+*.sqlite
+*.sqlite3
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Documentación (no necesaria en la imagen)
+*.md
+*.txt
+LEEME_PRIMERO.txt
+
+# Scripts locales (no necesarios en Azure)
+iniciar_portal.sh
+iniciar_todas_apps.sh
+
+# Tests y otros
+tests/
+.pytest_cache/
+htmlcov/
+.coverage
+
+# macOS
+.DS_Store
+

@@ -1,0 +1,12 @@
+# Configuración para Sistema de Aplicaciones IA - Inapsis
+# Copia este archivo a .env y completa con tus credenciales
+
+# API Key de OpenAI (obligatorio)
+# Obtén tu clave en: https://platform.openai.com/api-keys
+OPENAI_API_KEY=
+
+# Configuración opcional (descomenta si necesitas cambiar valores por defecto)
+# MODEL_NAME=gpt-3.5-turbo
+# MAX_TOKENS=1000
+# TEMPERATURE=0.7
+

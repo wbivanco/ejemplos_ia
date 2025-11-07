@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+dist/
+*.egg-info/
+
+# Entorno
+.env
+
+# Base de datos
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Azure
+.azure/
+*.publish
+*.pubxml
+*.publishproj
+azuredeployment/
+
+# Deployment
+deploy_config_local.json
+.deployment
+
