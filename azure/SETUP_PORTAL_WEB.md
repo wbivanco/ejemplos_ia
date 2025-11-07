@@ -49,7 +49,19 @@ Añadir:
 
 ---
 
-### 4️⃣ Obtener Publish Profile para GitHub
+### 4️⃣ Habilitar Autenticación Básica (Requerido)
+
+⚠️ **Paso crítico:** Azure necesita esto para GitHub Actions
+
+1. En tu Web App: **Configuration** → **General settings**
+2. Baja hasta la sección **"Platform settings"**
+3. Encuentra **"Basic Auth Publishing Credentials"** o **"SCM Basic Auth Publishing Credentials"**
+4. Cambia a **"On"** (Activar)
+5. Click **"Save"**
+
+---
+
+### 5️⃣ Obtener Publish Profile para GitHub
 
 1. En tu Web App, click **"Get publish profile"** (arriba)
 2. Se descarga un archivo `.PublishSettings`
@@ -58,7 +70,7 @@ Añadir:
 
 ---
 
-### 5️⃣ Configurar GitHub Secret
+### 6️⃣ Configurar GitHub Secret
 
 1. Ve a tu repositorio en GitHub
 2. **Settings** → **Secrets and variables** → **Actions**
@@ -69,7 +81,7 @@ Añadir:
 
 ---
 
-### 6️⃣ Deploy Inicial
+### 7️⃣ Deploy Inicial
 
 ```bash
 git add .
@@ -176,6 +188,7 @@ git push origin main
 - [ ] Plan de pricing seleccionado
 - [ ] OPENAI_API_KEY configurada
 - [ ] Startup command configurada
+- [ ] **Autenticación básica habilitada** ⚠️
 - [ ] Publish profile descargado
 - [ ] Secret añadido en GitHub
 - [ ] Código pusheado a main

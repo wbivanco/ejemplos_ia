@@ -4,13 +4,14 @@ import subprocess
 import os
 from pathlib import Path
 
-# Configuración de la página
-st.set_page_config(
-    page_title="Inapsis IA - Portal de Eventos",
-    page_icon="🧠",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
+# Configuración de la página (solo si no está en modo unificado)
+if 'is_unified_app' not in st.session_state:
+    st.set_page_config(
+        page_title="Inapsis IA - Portal de Eventos",
+        page_icon="🧠",
+        layout="wide",
+        initial_sidebar_state="collapsed"
+    )
 
 # Estilos personalizados
 st.markdown("""
@@ -78,10 +79,16 @@ with col1:
     """, unsafe_allow_html=True)
     
     if st.button("🚀 Iniciar Diagnóstico", use_container_width=True, type="primary"):
-        st.info("📱 Abriendo aplicación de Diagnóstico Empresarial...")
-        st.markdown("**Instrucciones:**")
-        st.code("streamlit run diagnostico/app.py --server.port 8502", language="bash")
-        st.markdown("O ejecuta en tu terminal el comando de arriba")
+        if 'is_unified_app' in st.session_state:
+            # Modo unificado: navegar a la app
+            st.session_state.pagina_actual = 'diagnostico'
+            st.rerun()
+        else:
+            # Modo standalone: mostrar instrucciones
+            st.info("📱 Abriendo aplicación de Diagnóstico Empresarial...")
+            st.markdown("**Instrucciones:**")
+            st.code("streamlit run diagnostico/app.py --server.port 8502", language="bash")
+            st.markdown("O ejecuta en tu terminal el comando de arriba")
 
 with col2:
     st.markdown("""
@@ -92,10 +99,16 @@ with col2:
     """, unsafe_allow_html=True)
     
     if st.button("✨ Crear Mi Gemelo", use_container_width=True, type="primary"):
-        st.info("📱 Abriendo aplicación Gemelo IA...")
-        st.markdown("**Instrucciones:**")
-        st.code("streamlit run gemelo/app.py --server.port 8503", language="bash")
-        st.markdown("O ejecuta en tu terminal el comando de arriba")
+        if 'is_unified_app' in st.session_state:
+            # Modo unificado: navegar a la app
+            st.session_state.pagina_actual = 'gemelo'
+            st.rerun()
+        else:
+            # Modo standalone: mostrar instrucciones
+            st.info("📱 Abriendo aplicación Gemelo IA...")
+            st.markdown("**Instrucciones:**")
+            st.code("streamlit run gemelo/app.py --server.port 8503", language="bash")
+            st.markdown("O ejecuta en tu terminal el comando de arriba")
 
 with col3:
     st.markdown("""
@@ -106,10 +119,16 @@ with col3:
     """, unsafe_allow_html=True)
     
     if st.button("🎯 Jugar Ahora", use_container_width=True, type="primary"):
-        st.info("📱 Abriendo Juego IA...")
-        st.markdown("**Instrucciones:**")
-        st.code("streamlit run juego/app.py --server.port 8504", language="bash")
-        st.markdown("O ejecuta en tu terminal el comando de arriba")
+        if 'is_unified_app' in st.session_state:
+            # Modo unificado: navegar a la app
+            st.session_state.pagina_actual = 'juego'
+            st.rerun()
+        else:
+            # Modo standalone: mostrar instrucciones
+            st.info("📱 Abriendo Juego IA...")
+            st.markdown("**Instrucciones:**")
+            st.code("streamlit run juego/app.py --server.port 8504", language="bash")
+            st.markdown("O ejecuta en tu terminal el comando de arriba")
 
 # Información adicional
 st.markdown("---")
@@ -117,31 +136,57 @@ st.markdown("---")
 col_info1, col_info2 = st.columns(2)
 
 with col_info1:
-    st.markdown("""
-    ### 📊 Acerca de este Demo
-    
-    Este sistema está diseñado para funcionar 100% localmente, conectándose únicamente 
-    a la API de OpenAI para las inferencias. 
-    
-    **Ventajas:**
-    - ✅ Bajo costo operativo
-    - ✅ Control total de los datos
-    - ✅ Sin dependencia de infraestructura cloud
-    - ✅ Ideal para eventos presenciales
-    """)
+    if 'is_unified_app' in st.session_state:
+        # Modo unificado (Azure/Cloud)
+        st.markdown("""
+        ### 📊 Acerca de este Demo
+        
+        Este sistema está diseñado para funcionar online, conectándose únicamente 
+        a la API de OpenAI para las inferencias. 
+        
+        **Ventajas:**
+        - ✅ Bajo costo operativo
+        - ✅ Control total de los datos
+        - ✅ Ideal para eventos presenciales
+        """)
+    else:
+        # Modo standalone (Local)
+        st.markdown("""
+        ### 📊 Acerca de este Demo
+        
+        Este sistema está diseñado para funcionar 100% localmente, conectándose únicamente 
+        a la API de OpenAI para las inferencias. 
+        
+        **Ventajas:**
+        - ✅ Bajo costo operativo
+        - ✅ Control total de los datos
+        - ✅ Sin dependencia de infraestructura cloud
+        - ✅ Ideal para eventos presenciales
+        """)
 
 with col_info2:
-    st.markdown("""
-    ### 🌐 Acceso desde Otros Dispositivos
-    
-    Para permitir que otros usuarios accedan desde sus dispositivos:
-    
-    1. Encuentra tu IP local: `ifconfig` (Mac/Linux) o `ipconfig` (Windows)
-    2. Ejecuta con: `streamlit run main_menu.py --server.address 0.0.0.0`
-    3. Comparte la URL: `http://TU_IP:8501`
-    
-    **Ejemplo:** `http://192.168.0.10:8501`
-    """)
+    if 'is_unified_app' in st.session_state:
+        # Modo unificado (Azure/Cloud) - Mostrar QR
+        st.markdown("""
+        ### 🌐 Acceso desde Otros Dispositivos
+        
+        Para permitir que otros usuarios accedan desde sus dispositivos:
+        
+        **Escanea el QR code con tu dispositivo móvil:** `aquí va el QR code`
+        """)
+    else:
+        # Modo standalone (Local) - Instrucciones de IP
+        st.markdown("""
+        ### 🌐 Acceso desde Otros Dispositivos
+        
+        Para permitir que otros usuarios accedan desde sus dispositivos:
+        
+        1. Encuentra tu IP local: `ifconfig` (Mac/Linux) o `ipconfig` (Windows)
+        2. Ejecuta con: `streamlit run main_menu.py --server.address 0.0.0.0`
+        3. Comparte la URL: `http://TU_IP:8501`
+        
+        **Ejemplo:** `http://192.168.0.10:8501`
+        """)
 
 # Estadísticas (si existe la base de datos)
 db_path = Path("evento_inapsis.db")
@@ -182,7 +227,7 @@ if db_path.exists():
 st.markdown("""
     <div class="footer">
         <p>🚀 Desarrollado por Inapsis</p>
-        <p style="font-size: 0.9rem;">Innovación tecnológica aplicada a la realidad</p>
+        <p style="font-size: 0.9rem;">Innovación Aplicada a Sistemas</p>
     </div>
 """, unsafe_allow_html=True)
 
@@ -195,11 +240,6 @@ with st.sidebar:
     - IA: OpenAI API
     - Base de datos: SQLite
     
-    **Puertos:**
-    - Portal: 8501
-    - Diagnóstico: 8502
-    - Gemelo: 8503
-    - Juego: 8504
     """)
     
     st.markdown("---")

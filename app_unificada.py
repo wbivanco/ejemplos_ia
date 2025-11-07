@@ -10,6 +10,10 @@ st.set_page_config(
     layout="wide"
 )
 
+# Bandera para indicar que estamos en modo unificado
+if 'is_unified_app' not in st.session_state:
+    st.session_state.is_unified_app = True
+
 # Añadir el directorio raíz al path
 sys.path.insert(0, str(Path(__file__).parent))
 

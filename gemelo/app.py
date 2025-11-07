@@ -10,12 +10,13 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from utils.openai_client import get_openai_client
 from utils.db import get_db
 
-# Configuración de la página
-st.set_page_config(
-    page_title="Gemelo IA",
-    page_icon="👤",
-    layout="wide"
-)
+# Configuración de la página (solo si no está en modo unificado)
+if 'is_unified_app' not in st.session_state:
+    st.set_page_config(
+        page_title="Gemelo IA",
+        page_icon="👤",
+        layout="wide"
+    )
 
 # Estilos CSS
 st.markdown("""
@@ -277,7 +278,13 @@ else:
     
     with col3:
         if st.button("🏠 Volver al Portal", use_container_width=True):
-            st.info("Cierra esta pestaña y regresa al portal principal")
+            if 'is_unified_app' in st.session_state:
+                # Modo unificado: navegar a home
+                st.session_state.pagina_actual = 'home'
+                st.rerun()
+            else:
+                # Modo standalone: mostrar mensaje
+                st.info("Cierra esta pestaña y regresa al portal principal")
 
 # Footer
 st.markdown("---")
