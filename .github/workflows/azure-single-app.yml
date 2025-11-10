@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: inapsis-ia-app
+  AZURE_WEBAPP_NAME: ejemplos-ia
   PYTHON_VERSION: '3.11'
 
 jobs:
@@ -48,4 +48,5 @@ jobs:
       run: |
         echo "✅ Deployment completado"
         echo "🌐 URL: https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net"
+        echo "🌐 URL completa: https://ejemplos-ia-eze6fthyhke2fpa4.canadacentral-01.azurewebsites.net"
 
