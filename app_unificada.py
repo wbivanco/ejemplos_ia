@@ -149,6 +149,13 @@ with st.sidebar:
     if st.button("🎮 Juego IA", use_container_width=True):
         st.session_state.pagina_actual = 'juego'
         st.rerun()
+    
+    st.markdown("---")
+    st.markdown("### 🧠 Inteligencia Natural")
+    
+    if st.button("🧩 Juego de Lógica", use_container_width=True):
+        st.session_state.pagina_actual = 'logica'
+        st.rerun()
 
 # Mostrar la página correspondiente
 if st.session_state.pagina_actual == 'home':
@@ -166,5 +173,9 @@ elif st.session_state.pagina_actual == 'gemelo':
 elif st.session_state.pagina_actual == 'juego':
     # Importar la app de juego
     exec(open('juego/app.py').read())
+
+elif st.session_state.pagina_actual == 'logica':
+    # Importar la app de lógica
+    exec(open('logica/app.py').read())
 
 

@@ -229,6 +229,32 @@ with col3:
             st.code("streamlit run juego/app.py --server.port 8504", language="bash")
             st.markdown("O ejecuta en tu terminal el comando de arriba")
 
+# Nueva sección: Inteligencia Natural
+st.markdown("---")
+st.markdown("### 🧠 Inteligencia Natural vs Artificial")
+
+col4, col5, col6 = st.columns([1, 1, 1])
+
+with col5:
+    st.markdown("""
+        <div class="app-card">
+            <h3>🧩 Juego de Lógica</h3>
+            <p>Demuestra tu inteligencia natural. Sin IA, solo tu mente resolviendo desafíos de lógica, patrones y matemáticas.</p>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    if st.button("🧠 ¡Demostrar Inteligencia!", use_container_width=True, type="primary"):
+        if 'is_unified_app' in st.session_state:
+            # Modo unificado: navegar a la app
+            st.session_state.pagina_actual = 'logica'
+            st.rerun()
+        else:
+            # Modo standalone: mostrar instrucciones
+            st.info("📱 Abriendo Juego de Lógica...")
+            st.markdown("**Instrucciones:**")
+            st.code("streamlit run logica/app.py --server.port 8505", language="bash")
+            st.markdown("O ejecuta en tu terminal el comando de arriba")
+
 # Información adicional
 st.markdown("---")
 
