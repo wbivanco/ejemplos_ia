@@ -17,30 +17,39 @@ if 'is_unified_app' not in st.session_state:
         layout="wide"
     )
 
-# Estilos CSS
+# Estilos CSS con paleta Inapsis
 st.markdown("""
     <style>
     .main-title {
         text-align: center;
-        padding: 2rem 0;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 2.5rem 1rem;
+        background: linear-gradient(135deg, #8B7BC8 0%, #FF6B5A 100%);
         color: white;
-        border-radius: 10px;
+        border-radius: 15px;
         margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(255, 107, 90, 0.3);
+    }
+    .main-title h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
     }
     .question-box {
-        background: #f8f9fa;
+        background: linear-gradient(135deg, rgba(139, 123, 200, 0.1) 0%, rgba(255, 107, 90, 0.1) 100%);
         padding: 1.5rem;
         border-radius: 10px;
-        border-left: 4px solid #667eea;
+        border-left: 4px solid #8B7BC8;
         margin: 1rem 0;
     }
     .result-box {
-        background: #e8f5e9;
+        background: linear-gradient(135deg, rgba(139, 123, 200, 0.15) 0%, rgba(255, 107, 90, 0.15) 100%);
         padding: 2rem;
-        border-radius: 10px;
-        border-left: 4px solid #4caf50;
+        border-radius: 15px;
+        border-left: 4px solid #FF6B5A;
         margin-top: 2rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+    .result-box h3 {
+        color: #8B7BC8;
     }
     </style>
 """, unsafe_allow_html=True)

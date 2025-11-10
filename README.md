@@ -28,6 +28,12 @@ ejemplos_expo/
 │   ├── gemelo/app.py             → Generador de gemelo IA
 │   └── juego/app.py              → Juego interactivo
 │
+├── 🖼️ Assets
+│   ├── inapsis_logo.png          → Logo de Inapsis
+│   ├── inapsis_styles.py         → Paleta y estilos
+│   ├── README.md                 → Guía de estilos
+│   └── INSTRUCCIONES_LOGO.txt    → Cómo usar el logo
+│
 ├── 🛠️ Utilidades
 │   └── utils/
 │       ├── openai_client.py      → Cliente OpenAI
@@ -41,6 +47,30 @@ ejemplos_expo/
     └── .github/workflows/
         └── azure-single-app.yml  → GitHub Actions
 ```
+
+---
+
+## 🎨 Diseño Visual
+
+El sistema utiliza la **paleta de colores oficial de Inapsis**, basada en el logo corporativo:
+
+### Colores de Marca
+- **🟣 Púrpura Inapsis**: `#8B7BC8` - Color principal
+- **🧡 Coral Inapsis**: `#FF6B5A` - Color de acento
+
+### Características Visuales
+- ✨ **Gradientes**: Transiciones suaves entre púrpura y coral
+- 🎯 **Animaciones**: Efectos hover y transiciones fluidas
+- 📱 **Responsive**: Adaptado a todos los dispositivos
+- 🖼️ **Logo integrado**: Aparece en portal principal y sidebar
+
+### Personalizar
+Para modificar estilos y ver la paleta completa, consulta:
+- 📄 `assets/README.md` - Guía completa de estilos
+- 🎨 `assets/inapsis_styles.py` - Módulo de estilos Python
+- 📝 `CAMBIOS_VISUALES.md` - Documentación de cambios visuales
+
+**Nota**: Para usar el logo real de Inapsis, guarda la imagen como `assets/inapsis_logo.png` (ver `assets/INSTRUCCIONES_LOGO.txt`).
 
 ---
 

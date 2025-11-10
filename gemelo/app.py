@@ -18,30 +18,39 @@ if 'is_unified_app' not in st.session_state:
         layout="wide"
     )
 
-# Estilos CSS
+# Estilos CSS con paleta Inapsis
 st.markdown("""
     <style>
     .main-title {
         text-align: center;
-        padding: 2rem 0;
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        padding: 2.5rem 1rem;
+        background: linear-gradient(135deg, #8B7BC8 0%, #FF6B5A 100%);
         color: white;
-        border-radius: 10px;
+        border-radius: 15px;
         margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(255, 107, 90, 0.3);
+    }
+    .main-title h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
     }
     .input-section {
-        background: #f8f9fa;
+        background: linear-gradient(135deg, rgba(139, 123, 200, 0.1) 0%, rgba(255, 107, 90, 0.1) 100%);
         padding: 2rem;
-        border-radius: 10px;
+        border-radius: 12px;
         margin: 1rem 0;
+        border-left: 4px solid #8B7BC8;
     }
     .gemelo-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #8B7BC8 0%, #FF6B5A 100%);
         color: white;
-        padding: 2rem;
+        padding: 2.5rem;
         border-radius: 15px;
         margin: 2rem 0;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        box-shadow: 0 10px 30px rgba(139, 123, 200, 0.4);
+    }
+    .gemelo-card h2, .gemelo-card h3 {
+        color: white !important;
     }
     .stat-box {
         background: rgba(255,255,255,0.2);
@@ -49,6 +58,7 @@ st.markdown("""
         border-radius: 10px;
         margin: 0.5rem 0;
         backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.3);
     }
     </style>
 """, unsafe_allow_html=True)

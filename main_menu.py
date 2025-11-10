@@ -13,42 +13,79 @@ if 'is_unified_app' not in st.session_state:
         initial_sidebar_state="collapsed"
     )
 
-# Estilos personalizados
+# Estilos personalizados con paleta Inapsis
 st.markdown("""
     <style>
+    .logo-container {
+        text-align: center;
+        padding: 1.5rem 0;
+    }
     .main-header {
         text-align: center;
-        padding: 2rem 0;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 2.5rem 1rem;
+        background: linear-gradient(135deg, #8B7BC8 0%, #FF6B5A 100%);
         color: white;
-        border-radius: 10px;
+        border-radius: 15px;
         margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(255, 107, 90, 0.3);
+    }
+    .main-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
     }
     .app-card {
         padding: 2rem;
-        border-radius: 10px;
-        background: #f8f9fa;
-        border-left: 5px solid #667eea;
-        margin-bottom: 1rem;
-        transition: transform 0.2s;
+        border-radius: 12px;
+        background: white;
+        border-left: 5px solid #FF6B5A;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
     .app-card:hover {
-        transform: translateX(5px);
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transform: translateX(8px);
+        box-shadow: 0 4px 20px rgba(139, 123, 200, 0.2);
+        border-left-color: #8B7BC8;
+    }
+    .app-card h3 {
+        color: #8B7BC8;
+        margin-bottom: 1rem;
     }
     .footer {
         text-align: center;
-        padding: 2rem 0;
+        padding: 3rem 0 2rem 0;
         color: #666;
-        margin-top: 3rem;
+        margin-top: 4rem;
+        border-top: 2px solid #f8f9fa;
+    }
+    .footer .brand {
+        font-size: 1.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #8B7BC8 0%, #FF6B5A 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .info-box {
+        background: linear-gradient(135deg, rgba(139, 123, 200, 0.1) 0%, rgba(255, 107, 90, 0.1) 100%);
+        padding: 1.5rem;
+        border-radius: 10px;
+        border-left: 4px solid #8B7BC8;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# Header principal
+# Logo y Header principal
+logo_path = Path("assets/inapsis_logo.png")
+if logo_path.exists():
+    col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
+    with col_logo2:
+        st.image(str(logo_path), use_container_width=True)
+
 st.markdown("""
     <div class="main-header">
-        <h1>🧠 Inapsis IA</h1>
+        <h1>Inapsis IA</h1>
         <p style="font-size: 1.2rem;">Experimenta el Futuro de la Inteligencia Artificial</p>
     </div>
 """, unsafe_allow_html=True)
@@ -226,8 +263,8 @@ if db_path.exists():
 # Footer
 st.markdown("""
     <div class="footer">
-        <p>🚀 Desarrollado por Inapsis</p>
-        <p style="font-size: 0.9rem;">Innovación Aplicada a Sistemas</p>
+        <p class="brand">Inapsis</p>
+        <p style="font-size: 0.95rem; margin-top: 0.5rem;">Innovación aplicada a sistemas</p>
     </div>
 """, unsafe_allow_html=True)
 

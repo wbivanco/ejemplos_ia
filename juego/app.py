@@ -18,43 +18,54 @@ if 'is_unified_app' not in st.session_state:
         layout="wide"
     )
 
-# Estilos CSS
+# Estilos CSS con paleta Inapsis
 st.markdown("""
     <style>
     .main-title {
         text-align: center;
-        padding: 2rem 0;
-        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        padding: 2.5rem 1rem;
+        background: linear-gradient(135deg, #8B7BC8 0%, #FF6B5A 100%);
         color: white;
-        border-radius: 10px;
+        border-radius: 15px;
         margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(255, 107, 90, 0.3);
+    }
+    .main-title h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
     }
     .question-card {
-        background: #f8f9fa;
+        background: linear-gradient(135deg, rgba(139, 123, 200, 0.08) 0%, rgba(255, 107, 90, 0.08) 100%);
         padding: 2rem;
         border-radius: 15px;
-        border: 3px solid #667eea;
+        border: 3px solid #8B7BC8;
         margin: 2rem 0;
         min-height: 250px;
+        transition: all 0.3s ease;
+    }
+    .question-card:hover {
+        border-color: #FF6B5A;
+        box-shadow: 0 4px 20px rgba(139, 123, 200, 0.2);
     }
     .score-box {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #8B7BC8 0%, #FF6B5A 100%);
         color: white;
         padding: 1.5rem;
-        border-radius: 10px;
+        border-radius: 12px;
         text-align: center;
         margin: 1rem 0;
+        box-shadow: 0 4px 15px rgba(255, 107, 90, 0.3);
     }
     .correct {
-        background: #d4edda;
-        border: 2px solid #28a745;
+        background: linear-gradient(135deg, rgba(139, 123, 200, 0.15) 0%, rgba(76, 175, 80, 0.15) 100%);
+        border: 2px solid #4caf50;
         padding: 1rem;
         border-radius: 10px;
         margin: 1rem 0;
     }
     .incorrect {
-        background: #f8d7da;
-        border: 2px solid #dc3545;
+        background: linear-gradient(135deg, rgba(255, 107, 90, 0.15) 0%, rgba(220, 53, 69, 0.15) 100%);
+        border: 2px solid #FF6B5A;
         padding: 1rem;
         border-radius: 10px;
         margin: 1rem 0;
