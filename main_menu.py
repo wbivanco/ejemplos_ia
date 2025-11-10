@@ -2,7 +2,13 @@
 import streamlit as st
 import subprocess
 import os
+import base64
 from pathlib import Path
+
+def get_image_base64(image_path):
+    """Convierte imagen a base64 para uso en HTML"""
+    with open(image_path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
 
 # Configuración de la página (solo si no está en modo unificado)
 if 'is_unified_app' not in st.session_state:
@@ -73,22 +79,78 @@ st.markdown("""
         border-radius: 10px;
         border-left: 4px solid #8B7BC8;
     }
+    /* Ocultar botón de fullscreen y controles de imágenes */
+    button[title="View fullscreen"],
+    button[kind="header"],
+    [data-testid="StyledFullScreenButton"],
+    .fullScreenFrame button {
+        display: none !important;
+        visibility: hidden !important;
+    }
+    /* Centrar imágenes del header */
+    .main img {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    /* Ocultar overlay de imágenes */
+    [data-testid="stImage"] button {
+        display: none !important;
+    }
+    /* Ocultar anclas de headers */
+    .css-10trblm,
+    [data-testid="stHeaderActionElements"],
+    h1 a, h2 a, h3 a {
+        display: none !important;
+    }
+    
+    /* Responsive para móviles */
+    @media (max-width: 768px) {
+        .app-card {
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .app-card h3 {
+            font-size: 1.3rem;
+        }
+        .main-header h1 {
+            font-size: 2rem !important;
+        }
+        .footer {
+            padding: 2rem 0 1rem 0;
+        }
+        .footer .brand {
+            font-size: 1.2rem;
+        }
+    }
     </style>
 """, unsafe_allow_html=True)
 
-# Logo y Header principal
+# Header principal - compacto sin scroll automático
+# Logo centrado con columnas y enlace
 logo_path = Path("assets/inapsis_logo.png")
 if logo_path.exists():
-    col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
-    with col_logo2:
-        st.image(str(logo_path), use_container_width=True)
+    try:
+        col_l1, col_l2, col_l3 = st.columns([2, 1, 2])
+        with col_l2:
+            st.markdown(
+                f'<a href="https://inapsis.com.ar" target="_blank" style="display: block; text-align: center;">'
+                f'<img src="data:image/png;base64,{get_image_base64(str(logo_path))}" style="max-width: 200px; width: 100%; height: auto; cursor: pointer;"></a>',
+                unsafe_allow_html=True
+            )
+    except:
+        pass
 
+# Subtítulo centrado debajo del logo
 st.markdown("""
-    <div class="main-header">
-        <h1>Inapsis IA</h1>
-        <p style="font-size: 1.2rem;">Experimenta el Futuro de la Inteligencia Artificial</p>
+    <div style="text-align: center; margin-top: -0.8rem; margin-bottom: 0.8rem;">
+        <p style="font-size: 1.1rem; color: #666; margin: 0;">
+            Experimenta el Futuro de la Inteligencia Artificial
+        </p>
     </div>
 """, unsafe_allow_html=True)
+
+st.markdown("---")
 
 # Verificar API Key
 env_file = Path(".env")
@@ -130,19 +192,19 @@ with col1:
 with col2:
     st.markdown("""
         <div class="app-card">
-            <h3>👤 Gemelo IA</h3>
-            <p>Crea tu perfil personalizado generado por inteligencia artificial con descripción única.</p>
+            <h3>🦸 Generador de Superhéroes</h3>
+            <p>¡Conviértete en superhéroe! Con poderes, origen épico e imagen generada por IA. 100% Gratis.</p>
         </div>
     """, unsafe_allow_html=True)
     
-    if st.button("✨ Crear Mi Gemelo", use_container_width=True, type="primary"):
+    if st.button("⚡ ¡Ser Superhéroe!", use_container_width=True, type="primary"):
         if 'is_unified_app' in st.session_state:
             # Modo unificado: navegar a la app
             st.session_state.pagina_actual = 'gemelo'
             st.rerun()
         else:
             # Modo standalone: mostrar instrucciones
-            st.info("📱 Abriendo aplicación Gemelo IA...")
+            st.info("📱 Abriendo Generador de Superhéroes...")
             st.markdown("**Instrucciones:**")
             st.code("streamlit run gemelo/app.py --server.port 8503", language="bash")
             st.markdown("O ejecuta en tu terminal el comando de arriba")
@@ -150,8 +212,8 @@ with col2:
 with col3:
     st.markdown("""
         <div class="app-card">
-            <h3>🎮 Juego IA</h3>
-            <p>Pon a prueba tu intuición: ¿Puedes distinguir entre contenido creado por humanos e IA?</p>
+            <h3>🎮 Juego Visual IA</h3>
+            <p>¿Foto Real o IA? ¡Adivina qué imágenes son reales y cuáles hizo la computadora! Perfecto para niños.</p>
         </div>
     """, unsafe_allow_html=True)
     
@@ -263,27 +325,17 @@ if db_path.exists():
 # Footer
 st.markdown("""
     <div class="footer">
-        <p class="brand">Inapsis</p>
+        <p class="brand">
+            <a href="https://inapsis.com.ar" target="_blank" style="text-decoration: none; 
+               background: linear-gradient(135deg, #8B7BC8 0%, #FF6B5A 100%);
+               -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+               background-clip: text; cursor: pointer;">
+                Inapsis
+            </a>
+        </p>
         <p style="font-size: 0.95rem; margin-top: 0.5rem;">Innovación aplicada a sistemas</p>
     </div>
 """, unsafe_allow_html=True)
 
-# Sidebar con información técnica
-with st.sidebar:
-    st.markdown("### ⚙️ Información Técnica")
-    st.markdown("""
-    **Tecnologías:**
-    - Frontend: Streamlit
-    - IA: OpenAI API
-    - Base de datos: SQLite
-    
-    """)
-    
-    st.markdown("---")
-    st.markdown("### 💡 Consejos")
-    st.info("""
-    - Mantén este portal abierto como punto central
-    - Abre cada app en pestañas separadas
-    - Monitorea el uso de tokens en OpenAI
-    """)
+# Sidebar solo se usa en app_unificada.py, aquí no hace falta
 

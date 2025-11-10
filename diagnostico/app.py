@@ -51,6 +51,19 @@ st.markdown("""
     .result-box h3 {
         color: #8B7BC8;
     }
+    
+    /* Responsive para móviles */
+    @media (max-width: 768px) {
+        .main-title {
+            padding: 1.5rem 1rem;
+        }
+        .main-title h1 {
+            font-size: 1.8rem !important;
+        }
+        .question-box, .result-box {
+            padding: 1rem;
+        }
+    }
     </style>
 """, unsafe_allow_html=True)
 
