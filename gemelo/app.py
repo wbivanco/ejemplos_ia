@@ -92,6 +92,15 @@ if 'heroe_generado' not in st.session_state:
     st.session_state.heroe_generado = False
 if 'datos_usuario' not in st.session_state:
     st.session_state.datos_usuario = {}
+if 'superheroe_iniciado' not in st.session_state:
+    st.session_state.superheroe_iniciado = False
+    # Registrar inicio de la app
+    try:
+        db = get_db()
+        db.log_uso_app("Generador de Superhéroes", "inicio")
+    except:
+        pass
+    st.session_state.superheroe_iniciado = True
 
 # Header
 st.markdown("""
@@ -264,12 +273,37 @@ Hazlo divertido, inspirador y memorable. Usa emojis apropiados."""
                     
                     # Guardar en BD
                     db = get_db()
+                    
+                    # Registrar completado del superhéroe
+                    try:
+                        db.log_uso_app("Generador de Superhéroes", "completado", {
+                            "nombre": nombre,
+                            "profesion": profesion,
+                            "tiene_imagen": st.session_state.get('tiene_imagen', False)
+                        })
+                    except:
+                        pass
                     db.log_interaccion(
                         app_name="Generador de Superhéroes",
                         user_data=st.session_state.datos_usuario,
                         result=descripcion,
                         tokens_used=500
                     )
+                    
+                    # Guardar lead general (sin email por ahora, se puede agregar después)
+                    try:
+                        db.save_lead_general(
+                            nombre=nombre,
+                            profesion=profesion,
+                            hobby=hobby,
+                            rasgo_dominante=rasgo,
+                            estilo_preferido=estilo,
+                            descripcion_superheroe=descripcion,
+                            email=None,
+                            recibir_por_email=False
+                        )
+                    except Exception as db_error:
+                        pass  # No es crítico si falla
                     
                     st.rerun()
                     
@@ -286,7 +320,62 @@ else:
     with col2:
         if st.button("🔄 Crear Otro Superhéroe", use_container_width=True, type="secondary"):
             st.session_state.heroe_generado = False
+            st.session_state.email_capturado = False
             st.rerun()
+    
+    st.markdown("---")
+    
+    # SECCIÓN OPCIONAL: Email para recibir el superhéroe
+    if 'email_capturado' not in st.session_state:
+        st.session_state.email_capturado = False
+    
+    if not st.session_state.email_capturado:
+        st.markdown("""
+        <div style="background: linear-gradient(135deg, rgba(139, 123, 200, 0.1) 0%, rgba(255, 107, 90, 0.1) 100%);
+                    padding: 1.5rem; border-radius: 12px; border-left: 4px solid #8B7BC8; margin: 1rem 0;">
+            <h3 style="color: #8B7BC8; margin-top: 0;">📧 ¿Quieres recibir tu superhéroe por email?</h3>
+            <p style="color: #666; margin-bottom: 0.5rem;">
+                💡 Déjanos tu email y te enviaremos tu superhéroe completo con su imagen para que lo tengas siempre contigo.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        with st.form("email_form"):
+            col_email1, col_email2 = st.columns([2, 1])
+            with col_email1:
+                email_usuario = st.text_input("📧 Tu Email", placeholder="tu@email.com", key="email_superheroe")
+            with col_email2:
+                recibir_email = st.checkbox("Enviar por email", value=True, key="recibir_email")
+            
+            if st.form_submit_button("✅ Enviar", use_container_width=True):
+                if email_usuario and "@" in email_usuario:
+                    # Actualizar lead en BD con email
+                    try:
+                        db = get_db()
+                        # Buscar el último registro de este usuario y actualizarlo
+                        # Como no tenemos ID, actualizamos el más reciente con este nombre
+                        # En producción, sería mejor usar un ID de sesión
+                        db.save_lead_general(
+                            nombre=datos['nombre'],
+                            profesion=datos['profesion'],
+                            hobby=datos['hobby'],
+                            rasgo_dominante=datos['rasgo'],
+                            estilo_preferido=datos['estilo'],
+                            descripcion_superheroe=st.session_state.descripcion,
+                            email=email_usuario,
+                            recibir_por_email=recibir_email
+                        )
+                        st.session_state.email_capturado = True
+                        st.success("✅ ¡Gracias! Te enviaremos tu superhéroe por email pronto.")
+                        st.rerun()
+                    except Exception as e:
+                        st.warning(f"⚠️ Hubo un problema al guardar tu email: {str(e)}")
+                elif email_usuario:
+                    st.error("⚠️ Por favor ingresa un email válido")
+                else:
+                    st.info("💡 Puedes continuar sin email, tu superhéroe ya está listo abajo")
+                    st.session_state.email_capturado = True
+                    st.rerun()
     
     st.markdown("---")
     

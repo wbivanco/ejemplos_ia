@@ -174,6 +174,7 @@ with col1:
         <div class="app-card">
             <h3>💼 Diagnóstico Empresarial</h3>
             <p>Analiza tu negocio y descubre oportunidades de automatización personalizadas para tu empresa.</p>
+            <p style="color: #4CAF50; font-weight: 600; margin-top: 0.5rem;">✅ 100% Gratis</p>
         </div>
     """, unsafe_allow_html=True)
     
@@ -193,7 +194,8 @@ with col2:
     st.markdown("""
         <div class="app-card">
             <h3>🦸 Generador de Superhéroes</h3>
-            <p>¡Conviértete en superhéroe! Con poderes, origen épico e imagen generada por IA. 100% Gratis.</p>
+            <p>¡Conviértete en superhéroe! Con poderes, origen épico e imagen generada por IA.</p>
+            <p style="color: #4CAF50; font-weight: 600; margin-top: 0.5rem;">✅ 100% Gratis</p>
         </div>
     """, unsafe_allow_html=True)
     
@@ -212,34 +214,57 @@ with col2:
 with col3:
     st.markdown("""
         <div class="app-card">
-            <h3>🎮 Juego Visual IA</h3>
-            <p>¿Foto Real o IA? ¡Adivina qué imágenes son reales y cuáles hizo la computadora! Perfecto para niños.</p>
+            <h3>🍝 Generador de Brainrot Italiano</h3>
+            <p>¡Crea memes absurdos con estilo italiano! Divertido y colorido para niños.</p>
+            <p style="color: #4CAF50; font-weight: 600; margin-top: 0.5rem;">✅ 100% Gratis</p>
         </div>
     """, unsafe_allow_html=True)
     
-    if st.button("🎯 Jugar Ahora", use_container_width=True, type="primary"):
+    if st.button("🎨 ¡Crear Brainrot!", use_container_width=True, type="primary"):
         if 'is_unified_app' in st.session_state:
             # Modo unificado: navegar a la app
-            st.session_state.pagina_actual = 'juego'
+            st.session_state.pagina_actual = 'brainrot'
             st.rerun()
         else:
             # Modo standalone: mostrar instrucciones
-            st.info("📱 Abriendo Juego IA...")
+            st.info("📱 Abriendo Generador de Brainrot...")
             st.markdown("**Instrucciones:**")
-            st.code("streamlit run juego/app.py --server.port 8504", language="bash")
+            st.code("streamlit run brainrot/app.py --server.port 8506", language="bash")
             st.markdown("O ejecuta en tu terminal el comando de arriba")
+
+# JUEGO IA - COMENTADO (juego para niños deshabilitado temporalmente)
+# with col3:
+#     st.markdown("""
+#         <div class="app-card">
+#             <h3>🎮 Juego Visual IA</h3>
+#             <p>¿Foto Real o IA? ¡Adivina qué imágenes son reales y cuáles hizo la computadora! Perfecto para niños.</p>
+#         </div>
+#     """, unsafe_allow_html=True)
+#     
+#     if st.button("🎯 Jugar Ahora", use_container_width=True, type="primary"):
+#         if 'is_unified_app' in st.session_state:
+#             # Modo unificado: navegar a la app
+#             st.session_state.pagina_actual = 'juego'
+#             st.rerun()
+#         else:
+#             # Modo standalone: mostrar instrucciones
+#             st.info("📱 Abriendo Juego IA...")
+#             st.markdown("**Instrucciones:**")
+#             st.code("streamlit run juego/app.py --server.port 8504", language="bash")
+#             st.markdown("O ejecuta en tu terminal el comando de arriba")
 
 # Nueva sección: Inteligencia Natural
 st.markdown("---")
 st.markdown("### 🧠 Inteligencia Natural vs Artificial")
 
-col4, col5, col6 = st.columns([1, 1, 1])
+col4, col5, col6 = st.columns([1, 2, 1])
 
 with col5:
     st.markdown("""
         <div class="app-card">
             <h3>🧩 Juego de Lógica</h3>
             <p>Demuestra tu inteligencia natural. Sin IA, solo tu mente resolviendo desafíos de lógica, patrones y matemáticas.</p>
+            <p style="color: #4CAF50; font-weight: 600; margin-top: 0.5rem;">✅ 100% Gratis</p>
         </div>
     """, unsafe_allow_html=True)
     
@@ -312,41 +337,6 @@ with col_info2:
         
         **Ejemplo:** `http://192.168.0.10:8501`
         """)
-
-# Estadísticas (si existe la base de datos)
-db_path = Path("evento_inapsis.db")
-if db_path.exists():
-    st.markdown("---")
-    st.markdown("### 📈 Estadísticas del Evento")
-    
-    try:
-        from utils.db import get_db
-        db = get_db()
-        stats = db.get_stats()
-        
-        col_s1, col_s2, col_s3 = st.columns(3)
-        
-        with col_s1:
-            total_interacciones = sum(stats["interacciones_por_app"].values())
-            st.metric("Total Interacciones", total_interacciones)
-        
-        with col_s2:
-            st.metric("Promedio Juego", f"{stats['promedio_aciertos_juego']}%")
-        
-        with col_s3:
-            tokens = stats['total_tokens_usados']
-            costo_estimado = tokens * 0.000002  # Aproximado para GPT-3.5
-            st.metric("Tokens Usados", f"{tokens:,}")
-            st.caption(f"Costo estimado: ${costo_estimado:.4f}")
-            
-        # Detalle por app
-        if stats["interacciones_por_app"]:
-            st.markdown("**Interacciones por Aplicación:**")
-            for app, count in stats["interacciones_por_app"].items():
-                st.write(f"- {app}: {count}")
-                
-    except Exception as e:
-        st.warning(f"No se pudieron cargar estadísticas: {e}")
 
 # Footer
 st.markdown("""

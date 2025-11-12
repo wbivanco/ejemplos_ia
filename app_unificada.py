@@ -111,7 +111,27 @@ st.markdown("""
 
 # Inicializar session state para navegación
 if 'pagina_actual' not in st.session_state:
-    st.session_state.pagina_actual = 'home'
+    # Leer parámetro de URL si existe (compatible con Streamlit 1.28.2)
+    try:
+        # Intentar con la nueva API (Streamlit >= 1.29.0)
+        if hasattr(st, 'query_params'):
+            query_params = st.query_params
+            if 'pagina_actual' in query_params:
+                st.session_state.pagina_actual = query_params['pagina_actual']
+            else:
+                st.session_state.pagina_actual = 'home'
+        # Usar API experimental (Streamlit < 1.29.0)
+        elif hasattr(st, 'experimental_get_query_params'):
+            query_params = st.experimental_get_query_params()
+            if 'pagina_actual' in query_params:
+                # experimental_get_query_params devuelve una lista
+                st.session_state.pagina_actual = query_params['pagina_actual'][0]
+            else:
+                st.session_state.pagina_actual = 'home'
+        else:
+            st.session_state.pagina_actual = 'home'
+    except:
+        st.session_state.pagina_actual = 'home'
 
 # Sidebar para navegación
 with st.sidebar:
@@ -146,9 +166,14 @@ with st.sidebar:
         st.session_state.pagina_actual = 'gemelo'
         st.rerun()
     
-    if st.button("🎮 Juego IA", use_container_width=True):
-        st.session_state.pagina_actual = 'juego'
+    if st.button("🍝 Generador de Brainrot Italiano", use_container_width=True):
+        st.session_state.pagina_actual = 'brainrot'
         st.rerun()
+    
+    # JUEGO IA - COMENTADO (juego para niños deshabilitado temporalmente)
+    # if st.button("🎮 Juego IA", use_container_width=True):
+    #     st.session_state.pagina_actual = 'juego'
+    #     st.rerun()
     
     st.markdown("---")
     st.markdown("### 🧠 Inteligencia Natural")
@@ -170,12 +195,21 @@ elif st.session_state.pagina_actual == 'gemelo':
     # Importar la app de Generador de Superhéroes
     exec(open('gemelo/app.py').read())
 
-elif st.session_state.pagina_actual == 'juego':
-    # Importar la app de juego
-    exec(open('juego/app.py').read())
+# JUEGO IA - COMENTADO (juego para niños deshabilitado temporalmente)
+# elif st.session_state.pagina_actual == 'juego':
+#     # Importar la app de juego
+#     exec(open('juego/app.py').read())
 
 elif st.session_state.pagina_actual == 'logica':
     # Importar la app de lógica
     exec(open('logica/app.py').read())
+
+elif st.session_state.pagina_actual == 'brainrot':
+    # Importar la app de brainrot italiano
+    exec(open('brainrot/app.py').read())
+
+elif st.session_state.pagina_actual == 'estadisticas':
+    # Importar la app de estadísticas
+    exec(open('estadisticas/app.py').read())
 
 

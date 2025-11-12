@@ -190,13 +190,20 @@ git push origin main
 
 ---
 
-## 🌐 URL de tu Aplicación
+## 🌐 URLs de Acceso
 
+### Portal Principal
 ```
-https://inapsis-ia-app.azurewebsites.net
+https://ejemplos-ia.azurewebsites.net
+```
+(Reemplaza `ejemplos-ia` con el nombre de tu Web App)
+
+### 📊 Dashboard de Estadísticas (Acceso Privado)
+```
+https://ejemplos-ia.azurewebsites.net/?pagina_actual=estadisticas
 ```
 
-(Reemplaza con el nombre que elegiste)
+**Nota:** El dashboard de estadísticas solo es accesible mediante esta URL directa. No aparece en el menú de navegación para mantenerlo privado.
 
 ---
 

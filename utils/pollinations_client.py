@@ -75,6 +75,27 @@ wearing colorful costume, heroic pose, cape,
 high quality digital art, vibrant colors, clean background"""
         
         return self.generate_image(prompt, width=512, height=768)
+    
+    def generate_brainrot(self, nombre_brainrot, animal_cosa, texto_italiano):
+        """
+        Genera una imagen de brainrot italiano basada en los datos
+        
+        Args:
+            nombre_brainrot: Nombre del brainrot generado
+            animal_cosa: Animal o cosa a incluir
+            texto_italiano: Texto en italiano para incluir en la imagen
+            
+        Returns:
+            PIL Image object
+        """
+        # Prompt optimizado para brainrot italiano
+        prompt = f"""Italian brainrot meme style: {nombre_brainrot} with a {animal_cosa}, 
+        Italian text: "{texto_italiano}", vibrant neon colors, absurd Italian meme style, 
+        funny colorful composition, high quality, brainrot aesthetic, colorful background, 
+        absurd and funny design, meme format, bright colors, Italian flag colors, 
+        chaotic fun style, digital art"""
+        
+        return self.generate_image(prompt, width=512, height=512)
 
 
 def get_pollinations_client():

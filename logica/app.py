@@ -99,6 +99,9 @@ if 'puntaje' not in st.session_state:
 if 'respondido' not in st.session_state:
     st.session_state.respondido = False
 
+# Importar db para estadísticas
+from utils.db import get_db
+
 # Base de datos de desafíos de lógica
 DESAFIOS = [
     {
@@ -784,6 +787,12 @@ if not st.session_state.logica_iniciado:
             st.session_state.pregunta_actual = 0
             st.session_state.puntaje = 0
             st.session_state.respondido = False
+            # Registrar inicio del juego
+            try:
+                db = get_db()
+                db.log_uso_app("Juego de Lógica", "inicio")
+            except:
+                pass
             st.rerun()
 
 # Juego en progreso
@@ -914,6 +923,23 @@ else:
         </p>
     </div>
     """, unsafe_allow_html=True)
+    
+    # Registrar completado del juego
+    try:
+        db = get_db()
+        db.log_uso_app("Juego de Lógica", "completado", {
+            "puntaje": st.session_state.puntaje,
+            "total": len(st.session_state.desafios),
+            "porcentaje": porcentaje
+        })
+        db.log_interaccion(
+            app_name="Juego de Lógica",
+            user_data={"puntaje": st.session_state.puntaje, "total": len(st.session_state.desafios)},
+            result=f"Puntuación: {porcentaje:.0f}%",
+            tokens_used=0  # No usa IA
+        )
+    except:
+        pass
     
     st.markdown("---")
     

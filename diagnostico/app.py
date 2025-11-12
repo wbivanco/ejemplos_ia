@@ -72,6 +72,15 @@ if 'diagnostico_completado' not in st.session_state:
     st.session_state.diagnostico_completado = False
 if 'respuestas' not in st.session_state:
     st.session_state.respuestas = {}
+if 'diagnostico_iniciado' not in st.session_state:
+    st.session_state.diagnostico_iniciado = False
+    # Registrar inicio de la app
+    try:
+        db = get_db()
+        db.log_uso_app("Diagnóstico Empresarial", "inicio")
+    except:
+        pass
+    st.session_state.diagnostico_iniciado = True
 
 # Header
 st.markdown("""
@@ -86,16 +95,50 @@ if not st.session_state.diagnostico_completado:
     st.markdown("""
     ### 👋 Bienvenido al Diagnóstico Empresarial
     
-    Responde algunas preguntas sobre tu negocio y nuestra IA te proporcionará un análisis 
-    personalizado con sugerencias específicas de automatización y mejora.
+    **🔧 Una herramienta importante para tu negocio**
     
-    **Este diagnóstico te tomará aproximadamente 2-3 minutos.**
+    Esta herramienta utiliza Inteligencia Artificial para analizar tu negocio y proporcionarte 
+    un diagnóstico personalizado con sugerencias específicas de automatización y mejora.
+    
+    **✅ 100% Gratuito** - Obtén insights valiosos sin costo alguno.
+    
+    **⏱️ Este diagnóstico te tomará aproximadamente 2-3 minutos.**
+    
+    ---
+    
+    **💡 ¿Buscas mayor precisión?**
+    
+    Para un análisis más profundo y personalizado, considera reservar una **consulta profesional** 
+    con nuestros expertos. Podremos analizar tu negocio en detalle y crear un plan de acción 
+    específico para tu empresa.
+    
+    *Este diagnóstico gratuito es un excelente punto de partida para identificar oportunidades.*
     """)
     
     st.markdown("---")
     
     # Formulario de diagnóstico
     with st.form("diagnostico_form"):
+        # SECCIÓN DE CONTACTO (OBLIGATORIA)
+        st.markdown("### 📧 Información de Contacto")
+        st.markdown("""
+        <div style="background: #fff3cd; padding: 1rem; border-radius: 8px; border-left: 4px solid #ffc107; margin-bottom: 1rem;">
+            <p style="margin: 0; color: #856404;">
+                <strong>💡 Para recibir tu diagnóstico completo por email, completa tus datos de contacto.</strong>
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        col_contact1, col_contact2 = st.columns(2)
+        with col_contact1:
+            email = st.text_input("📧 Email *", placeholder="tu@empresa.com", help="Obligatorio")
+            nombre = st.text_input("👤 Nombre Completo *", placeholder="Juan Pérez", help="Obligatorio")
+        with col_contact2:
+            empresa = st.text_input("🏢 Nombre de la Empresa *", placeholder="Mi Empresa S.A.", help="Obligatorio")
+            telefono = st.text_input("📱 Teléfono (Opcional)", placeholder="+54 11 1234-5678")
+        
+        st.markdown("---")
+        
         st.markdown('<div class="question-box">', unsafe_allow_html=True)
         
         # Pregunta 1: Tipo de negocio
@@ -161,9 +204,12 @@ if not st.session_state.diagnostico_completado:
         submitted = st.form_submit_button("🚀 Generar Diagnóstico", use_container_width=True, type="primary")
         
         if submitted:
-            # Validar que se hayan completado los campos obligatorios
-            if not tipo_negocio or not desafio or not procesos:
-                st.error("⚠️ Por favor completa todos los campos obligatorios")
+            # Validar campos de contacto obligatorios
+            if not email or not nombre or not empresa:
+                st.error("⚠️ Por favor completa todos los campos de contacto obligatorios (Email, Nombre, Empresa)")
+            # Validar que se hayan completado los campos del diagnóstico
+            elif not tipo_negocio or not desafio or not procesos:
+                st.error("⚠️ Por favor completa todos los campos del diagnóstico")
             else:
                 # Guardar respuestas
                 st.session_state.respuestas = {
@@ -215,14 +261,57 @@ El tono debe ser profesional pero cercano, con recomendaciones prácticas y acci
                         st.session_state.resultado = resultado
                         st.session_state.diagnostico_completado = True
                         
-                        # Guardar en la base de datos
+                        # Registrar completado del diagnóstico
+                        try:
+                            db.log_uso_app("Diagnóstico Empresarial", "completado", {
+                                "tipo_negocio": tipo_negocio,
+                                "tamano": tamano,
+                                "empresa": empresa
+                            })
+                        except:
+                            pass
+                        
+                        # Extraer oportunidades del diagnóstico (búsqueda simple de "Top 3" o "oportunidades")
+                        oportunidades = []
+                        if "oportunidad" in resultado.lower() or "automatización" in resultado.lower():
+                            # Intentar extraer las oportunidades mencionadas
+                            lines = resultado.split('\n')
+                            for line in lines:
+                                if any(keyword in line.lower() for keyword in ['automatización', 'oportunidad', 'recomendación']):
+                                    if line.strip() and len(line.strip()) > 10:
+                                        oportunidades.append(line.strip())
+                        
+                        # Guardar en la base de datos - Lead empresarial
                         db = get_db()
-                        db.log_interaccion(
-                            app_name="Diagnóstico Empresarial",
-                            user_data=st.session_state.respuestas,
-                            result=resultado,
-                            tokens_used=800  # Estimado
-                        )
+                        try:
+                            # IP address no disponible en Streamlit sin configuración adicional
+                            # Se puede agregar después si es necesario
+                            ip_address = None
+                            
+                            db.save_lead_empresarial(
+                                email=email,
+                                nombre=nombre,
+                                empresa=empresa,
+                                telefono=telefono if telefono else None,
+                                tipo_negocio=tipo_negocio,
+                                tamano_empresa=tamano,
+                                desafio_principal=desafio,
+                                procesos_repetitivos=procesos,
+                                presupuesto_tecnologico=presupuesto,
+                                diagnostico_ia=resultado,
+                                oportunidades_identificadas=oportunidades if oportunidades else procesos,
+                                ip_address=ip_address
+                            )
+                            
+                            # También guardar en interacciones (compatibilidad)
+                            db.log_interaccion(
+                                app_name="Diagnóstico Empresarial",
+                                user_data={**st.session_state.respuestas, "email": email, "nombre": nombre, "empresa": empresa},
+                                result=resultado,
+                                tokens_used=800  # Estimado
+                            )
+                        except Exception as db_error:
+                            st.warning(f"⚠️ El diagnóstico se generó correctamente, pero hubo un problema al guardar tus datos: {str(db_error)}")
                         
                         st.rerun()
                         
@@ -250,6 +339,23 @@ else:
     st.markdown(st.session_state.resultado)
     
     st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Mensaje sobre consulta profesional
+    st.markdown("---")
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, rgba(139, 123, 200, 0.15) 0%, rgba(255, 107, 90, 0.15) 100%);
+                padding: 2rem; border-radius: 12px; border-left: 4px solid #8B7BC8; margin: 2rem 0;">
+        <h3 style="color: #8B7BC8; margin-top: 0;">💼 ¿Necesitas un Análisis Más Profundo?</h3>
+        <p style="font-size: 1.1rem; color: #333; margin-bottom: 1rem;">
+            Este diagnóstico gratuito te ha dado una visión general de las oportunidades en tu negocio.
+        </p>
+        <p style="font-size: 1rem; color: #666; margin-bottom: 0;">
+            <strong>Para mayor precisión y un plan de acción detallado:</strong><br>
+            📞 Reserva una <strong>consulta profesional</strong> con nuestros expertos en transformación digital.<br>
+            Podremos analizar tu negocio en profundidad y crear una estrategia personalizada.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Opciones adicionales
     st.markdown("---")
