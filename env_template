@@ -24,4 +24,3 @@ SMTP_EMAIL=inapsis.info@gmail.com
 SMTP_PASSWORD=
 # SMTP_SERVER=smtp.gmail.com (por defecto)
 # SMTP_PORT=587 (por defecto)
-
