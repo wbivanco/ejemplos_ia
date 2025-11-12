@@ -107,6 +107,7 @@ pip install -r requirements.txt
 cp env_template .env
 # Editar .env y añadir:
 # - OPENAI_API_KEY (obligatorio)
+# - MODEL_NAME (opcional, default: gpt-4o-mini)
 # - SMTP_EMAIL y SMTP_PASSWORD (opcional, para envío de emails)
 ```
 
@@ -167,6 +168,8 @@ streamlit run estadisticas/app.py
 2. **New application setting:**
    - Name: `OPENAI_API_KEY`
    - Value: tu clave de OpenAI
+   - (Opcional) Name: `MODEL_NAME`
+   - (Opcional) Value: `gpt-4o-mini` (o el modelo que prefieras)
    - (Opcional) Name: `SMTP_EMAIL`
    - (Opcional) Value: `inapsis.info@gmail.com`
    - (Opcional) Name: `SMTP_PASSWORD`
@@ -329,13 +332,16 @@ Obtendrás:
 
 ### Ajustar configuración de IA
 
-Editar `utils/openai_client.py`:
+Cambiar modelo en `.env`:
+
+```env
+MODEL_NAME=gpt-4o-mini  # o gpt-3.5-turbo, gpt-4, etc.
+```
+
+O editar `utils/openai_client.py` para cambiar el default:
 
 ```python
-def chat_completion(self, messages, 
-                   model="gpt-3.5-turbo",     # Cambiar modelo
-                   temperature=0.7,            # Creatividad (0-2)
-                   max_tokens=500):            # Límite respuesta
+self.default_model = os.getenv("MODEL_NAME", "gpt-4o-mini")  # Cambiar default aquí
 ```
 
 ---
@@ -372,7 +378,7 @@ def chat_completion(self, messages,
 
 - **Python 3.11** - Backend
 - **Streamlit 1.28.2** - Framework web interactivo
-- **OpenAI API** - GPT-3.5-turbo (texto e imágenes)
+- **OpenAI API** - GPT-4o-mini (texto, más barato y mejor que GPT-3.5-turbo)
 - **Pollinations.ai** - Generación gratuita de imágenes
 - **SQLite** - Base de datos local
 - **Gmail SMTP** - Envío de emails

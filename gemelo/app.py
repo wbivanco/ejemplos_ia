@@ -200,7 +200,6 @@ Hazlo divertido, inspirador y memorable. Usa emojis apropiados."""
                         
                         descripcion = client.chat_completion(
                             messages=messages,
-                            model="gpt-3.5-turbo",
                             temperature=0.95,  # Máxima creatividad
                             max_tokens=600
                         )

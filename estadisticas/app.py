@@ -301,13 +301,14 @@ try:
     
     with col_r2:
         if total_tokens > 0:
-            # Estimación de costo (GPT-3.5-turbo: ~$0.0015 por 1K tokens)
-            costo_estimado = (total_tokens / 1000) * 0.0015
+            # Estimación de costo (GPT-4o-mini: ~$0.0006 por 1K tokens de salida, ~$0.00015 por entrada)
+            # Usamos promedio de $0.0004 por 1K tokens (mix entrada/salida)
+            costo_estimado = (total_tokens / 1000) * 0.0004
             st.markdown(f"""
             <div class="stat-card">
                 <h3>💰 Costo Estimado</h3>
                 <p class="number">${costo_estimado:.2f}</p>
-                <p style="font-size: 0.8rem; color: #666; margin: 0.5rem 0 0 0;">USD (GPT-3.5-turbo)</p>
+                <p style="font-size: 0.8rem; color: #666; margin: 0.5rem 0 0 0;">USD (GPT-4o-mini)</p>
             </div>
             """, unsafe_allow_html=True)
         else:

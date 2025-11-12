@@ -187,7 +187,6 @@ Ejemplos de estilo:
                                 
                                 nombre_brainrot = client.chat_completion(
                                     messages=messages_nombre,
-                                    model="gpt-3.5-turbo",
                                     temperature=0.9,
                                     max_tokens=30
                                 ).strip()
@@ -232,7 +231,6 @@ Solo devuelve la frase, sin explicaciones."""
                             
                             texto_italiano = client.chat_completion(
                                 messages=messages,
-                                model="gpt-3.5-turbo",
                                 temperature=0.9,
                                 max_tokens=50
                             ).strip()

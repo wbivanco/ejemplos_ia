@@ -14,23 +14,28 @@ class OpenAIClient:
         if not self.api_key:
             raise ValueError("OPENAI_API_KEY no encontrada en .env")
         self.client = OpenAI(api_key=self.api_key)
+        # Leer modelo desde variable de entorno o usar default
+        self.default_model = os.getenv("MODEL_NAME", "gpt-4o-mini")
     
-    def chat_completion(self, messages, model="gpt-3.5-turbo", temperature=0.7, max_tokens=500):
+    def chat_completion(self, messages, model=None, temperature=0.7, max_tokens=500):
         """
         Genera una respuesta de chat usando OpenAI
         
         Args:
             messages: Lista de mensajes en formato OpenAI
-            model: Modelo a usar (default: gpt-3.5-turbo)
+            model: Modelo a usar (si es None, usa MODEL_NAME de .env o gpt-4o-mini por defecto)
             temperature: Creatividad de la respuesta (0-2)
             max_tokens: Máximo de tokens en la respuesta
             
         Returns:
             str: Respuesta del modelo
         """
+        # Usar modelo pasado como parámetro, o el de la variable de entorno, o el default
+        model_to_use = model if model else self.default_model
+        
         try:
             response = self.client.chat.completions.create(
-                model=model,
+                model=model_to_use,
                 messages=messages,
                 temperature=temperature,
                 max_tokens=max_tokens
