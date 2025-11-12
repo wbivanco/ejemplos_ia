@@ -1,5 +1,6 @@
 """Portal Principal - Sistema de Aplicaciones IA Inapsis"""
 import streamlit as st
+import os
 import base64
 from pathlib import Path
 
@@ -151,9 +152,21 @@ st.markdown("""
 st.markdown("---")
 
 # Verificar API Key
+# En Azure, las variables de entorno se configuran desde el portal
+# En local, se usa el archivo .env
 env_file = Path(".env")
-if not env_file.exists():
-    st.error("⚠️ No se encontró el archivo .env. Por favor, copia .env.example a .env y configura tu OPENAI_API_KEY")
+openai_key = os.getenv("OPENAI_API_KEY")
+
+if not env_file.exists() and not openai_key:
+    st.error("⚠️ No se encontró el archivo .env ni la variable de entorno OPENAI_API_KEY.")
+    st.markdown("""
+    **Para desarrollo local:**
+    - Copia `env_template` a `.env` y configura tu `OPENAI_API_KEY`
+    
+    **Para Azure:**
+    - Ve a Azure Portal → Tu Web App → **Configuration** → **Application settings**
+    - Agrega `OPENAI_API_KEY` con tu clave de OpenAI
+    """)
     st.stop()
 
 # Introducción
