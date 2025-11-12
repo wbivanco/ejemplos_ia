@@ -345,8 +345,8 @@ else:
         st.markdown(f"**🐾 Animal/Cosa:** {datos['animal_cosa']}")
     
     with col_info2:
-        modo_nombre = "Automático 🎭" if datos['nombre_brainrot_automatico'] else "Personalizado ✍️"
-        modo_texto = "Automático 🇮🇹" if datos['italiano_automatico'] else "Personalizado ✍️"
+        modo_nombre = "Automático 🎭" if datos.get('nombre_brainrot_automatico', True) else "Personalizado ✍️"
+        modo_texto = "Automático 🇮🇹"  # Siempre automático (checkbox eliminado)
         st.markdown(f"**🎭 Nombre:** {modo_nombre}")
         st.markdown(f"**📝 Texto:** {modo_texto}")
 
