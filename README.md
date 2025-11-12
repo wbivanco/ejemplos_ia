@@ -4,9 +4,11 @@ Sistema de aplicaciones interactivas con IA deployado en Azure con CI/CD automá
 
 ## 🎯 Características
 
-- **💼 Diagnóstico Empresarial**: Chat inteligente que analiza negocios y sugiere automatizaciones
-- **👤 Gemelo IA**: Generador de perfiles personalizados con IA
-- **🎮 Juego IA**: Actividad interactiva "¿Persona o IA?"
+- **💼 Diagnóstico Empresarial**: Analiza negocios y genera diagnósticos personalizados con IA. Envía resultados por email automáticamente.
+- **🦸 Generador de Superhéroes**: Crea superhéroes personalizados con poderes, origen e imagen generada por IA
+- **🍝 Generador de Brainrot Italiano**: Crea memes absurdos con estilo italiano para niños (nombre, animal/cosa, texto italiano e imagen)
+- **🧩 Juego de Lógica**: Desafíos de razonamiento lógico sin IA
+- **📊 Dashboard de Estadísticas**: Visualiza métricas, leads y exporta datos a CSV (acceso privado)
 
 ---
 
@@ -24,20 +26,29 @@ ejemplos_expo/
 ├── 🎨 Aplicaciones
 │   ├── app_unificada.py          → App integrada (todas en una)
 │   ├── main_menu.py              → Portal principal
-│   ├── diagnostico/app.py        → Diagnóstico empresarial
-│   ├── gemelo/app.py             → Generador de gemelo IA
-│   └── juego/app.py              → Juego interactivo
+│   ├── diagnostico/app.py        → Diagnóstico empresarial (con envío por email)
+│   ├── gemelo/app.py             → Generador de superhéroes
+│   ├── brainrot/app.py           → Generador de brainrot italiano
+│   ├── logica/app.py             → Juego de lógica
+│   ├── estadisticas/app.py       → Dashboard de estadísticas
+│   └── juego/app.py              → Juego IA (comentado/deshabilitado)
 │
 ├── 🖼️ Assets
 │   ├── inapsis_logo.png          → Logo de Inapsis
-│   ├── inapsis_styles.py         → Paleta y estilos
-│   ├── README.md                 → Guía de estilos
-│   └── INSTRUCCIONES_LOGO.txt    → Cómo usar el logo
+│   └── imagenes/                 → Imágenes para juegos
 │
 ├── 🛠️ Utilidades
 │   └── utils/
 │       ├── openai_client.py      → Cliente OpenAI
-│       └── db.py                 → Base de datos SQLite
+│       ├── db.py                 → Base de datos SQLite
+│       ├── email_service.py      → Servicio de email (Gmail SMTP)
+│       └── pollinations_client.py → Cliente Pollinations.ai (imágenes)
+│
+├── 🔲 QR Generator
+│   └── qr/
+│       ├── generar_qr.py         → Generador de códigos QR
+│       ├── README.md             → Documentación QR
+│       └── requirements.txt      → Dependencias QR
 │
 ├── ⚙️ Configuración
 │   ├── requirements.txt          → Dependencias Python
@@ -64,13 +75,7 @@ El sistema utiliza la **paleta de colores oficial de Inapsis**, basada en el log
 - 📱 **Responsive**: Adaptado a todos los dispositivos
 - 🖼️ **Logo integrado**: Aparece en portal principal y sidebar
 
-### Personalizar
-Para modificar estilos y ver la paleta completa, consulta:
-- 📄 `assets/README.md` - Guía completa de estilos
-- 🎨 `assets/inapsis_styles.py` - Módulo de estilos Python
-- 📝 `CAMBIOS_VISUALES.md` - Documentación de cambios visuales
-
-**Nota**: Para usar el logo real de Inapsis, guarda la imagen como `assets/inapsis_logo.png` (ver `assets/INSTRUCCIONES_LOGO.txt`).
+**Nota**: Para usar el logo real de Inapsis, guarda la imagen como `assets/inapsis_logo.png`.
 
 ---
 
@@ -97,11 +102,16 @@ source venv/bin/activate  # En Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. **Configurar OpenAI API Key**
+4. **Configurar variables de entorno**
 ```bash
 cp env_template .env
-# Editar .env y añadir tu OPENAI_API_KEY
+# Editar .env y añadir:
+# - OPENAI_API_KEY (obligatorio)
+# - SMTP_EMAIL y SMTP_PASSWORD (opcional, para envío de emails)
 ```
+
+**📧 Configuración de Email (Opcional):**
+Para habilitar el envío automático de diagnósticos por email, consulta [`CONFIGURACION_EMAIL.md`](CONFIGURACION_EMAIL.md)
 
 ### Ejecutar aplicación unificada
 
@@ -110,8 +120,9 @@ streamlit run app_unificada.py
 ```
 
 Esto abrirá la aplicación en `http://localhost:8501` con:
-- ✅ Las 3 aplicaciones integradas (Diagnóstico, Gemelo, Juego)
+- ✅ Todas las aplicaciones integradas (Diagnóstico, Superhéroes, Brainrot, Lógica)
 - ✅ Navegación por sidebar
+- ✅ Dashboard de estadísticas (acceso por URL)
 - ✅ Exactamente como se verá en Azure
 
 ### Ejecutar apps individuales (opcional)
@@ -125,7 +136,9 @@ streamlit run main_menu.py
 # Apps individuales
 streamlit run diagnostico/app.py
 streamlit run gemelo/app.py
-streamlit run juego/app.py
+streamlit run brainrot/app.py
+streamlit run logica/app.py
+streamlit run estadisticas/app.py
 ```
 
 ---
@@ -154,6 +167,10 @@ streamlit run juego/app.py
 2. **New application setting:**
    - Name: `OPENAI_API_KEY`
    - Value: tu clave de OpenAI
+   - (Opcional) Name: `SMTP_EMAIL`
+   - (Opcional) Value: `inapsis.info@gmail.com`
+   - (Opcional) Name: `SMTP_PASSWORD`
+   - (Opcional) Value: tu contraseña de aplicación de Gmail
 3. **Save**
 
 #### 3️⃣ Configurar startup command
@@ -329,6 +346,8 @@ def chat_completion(self, messages,
 |------|-------------|--------|
 | [`azure/SETUP_PORTAL_WEB.md`](azure/SETUP_PORTAL_WEB.md) | ⭐ Guía completa paso a paso | 15 min |
 | [`azure/README_AZURE.md`](azure/README_AZURE.md) | Resumen ejecutivo | 5 min |
+| [`CONFIGURACION_EMAIL.md`](CONFIGURACION_EMAIL.md) | 📧 Configuración de Gmail SMTP | 5 min |
+| [`qr/README.md`](qr/README.md) | 🔲 Generador de códigos QR | 5 min |
 
 ---
 
@@ -339,6 +358,7 @@ def chat_completion(self, messages,
 - [ ] Runtime: Python 3.11, Linux
 - [ ] Plan: B1 (o el que prefieras)
 - [ ] `OPENAI_API_KEY` configurada
+- [ ] (Opcional) `SMTP_EMAIL` y `SMTP_PASSWORD` configuradas
 - [ ] Startup command: `startup_single.sh`
 - [ ] Publish profile descargado
 - [ ] Secret en GitHub configurado
@@ -351,9 +371,11 @@ def chat_completion(self, messages,
 ## 🎯 Tecnologías
 
 - **Python 3.11** - Backend
-- **Streamlit** - Framework web interactivo
-- **OpenAI API** - GPT-3.5-turbo
+- **Streamlit 1.28.2** - Framework web interactivo
+- **OpenAI API** - GPT-3.5-turbo (texto e imágenes)
+- **Pollinations.ai** - Generación gratuita de imágenes
 - **SQLite** - Base de datos local
+- **Gmail SMTP** - Envío de emails
 - **Azure App Service** - Hosting
 - **GitHub Actions** - CI/CD automático
 
@@ -362,13 +384,15 @@ def chat_completion(self, messages,
 ## 🔒 Seguridad y Privacidad
 
 ### Datos almacenados:
-- Diagnóstico: tipo de negocio, respuestas, resultado
-- Gemelo: nombre, edad, intereses, perfil generado
-- Juego: aciertos, total, porcentaje
+- **Diagnóstico Empresarial**: Email, nombre, empresa, teléfono, tipo de negocio, desafíos, diagnóstico generado
+- **Generador de Superhéroes**: Nombre, profesión, hobby, rasgos, descripción del superhéroe, email (opcional)
+- **Brainrot Italiano**: Nombre, animal/cosa, nombre brainrot, texto italiano
+- **Juego de Lógica**: Puntaje, total de desafíos, porcentaje
+- **Estadísticas**: Uso de apps, leads empresariales y generales
 
 ### NO se almacena:
-- ❌ Direcciones IP
-- ❌ Información sensible
+- ❌ Direcciones IP (excepto en leads empresariales, opcional)
+- ❌ Información sensible no relacionada con el servicio
 - ❌ Cookies de tracking
 - ❌ Datos bancarios
 
@@ -376,6 +400,7 @@ def chat_completion(self, messages,
 - Archivo: `evento_inapsis.db`
 - Formato: SQLite
 - Ubicación: En Azure (efímera) o local según config
+- Tablas: `interacciones`, `leads_empresariales`, `leads_generales`, `estadisticas_uso`, `resultados_juegos`
 
 ---
 
@@ -391,15 +416,24 @@ def chat_completion(self, messages,
 
 ---
 
+## ✨ Funcionalidades Implementadas
+
+- ✅ **Envío automático de emails** - Diagnósticos empresariales enviados por Gmail SMTP
+- ✅ **Dashboard de estadísticas** - Visualización de métricas y leads con exportación CSV
+- ✅ **Generación de imágenes** - Pollinations.ai para superhéroes y brainrot
+- ✅ **Recolección de leads** - Leads empresariales y generales con información completa
+- ✅ **Generador de QR** - Script portable para generar códigos QR personalizados
+- ✅ **Tracking de uso** - Estadísticas de inicio y completado por aplicación
+
 ## 🚀 Próximas Mejoras (Ideas)
 
-- [ ] Generación de imágenes con DALL-E
-- [ ] Dashboard avanzado con gráficos
+- [ ] Integración con WhatsApp para envío de diagnósticos
+- [ ] Dashboard avanzado con gráficos interactivos
 - [ ] Multi-idioma (inglés, portugués)
 - [ ] Exportar resultados en PDF
 - [ ] Sistema de puntos/gamificación
-- [ ] Integración con WhatsApp/Telegram
 - [ ] Análisis de sentimiento
+- [ ] Notificaciones push
 
 ---
 
@@ -443,8 +477,17 @@ Tu sistema está deployado en Azure con:
 
 **Desarrollado para:** Inapsis 🚀  
 **Deployment:** Azure App Service + GitHub Actions  
-**Versión:** 1.0.0  
-**Última actualización:** Noviembre 2025
+**Versión:** 2.0.0  
+**Última actualización:** Diciembre 2024
+
+### 📝 Changelog v2.0.0
+- ✅ Envío automático de diagnósticos por email (Gmail SMTP)
+- ✅ Dashboard de estadísticas con exportación CSV
+- ✅ Generador de Brainrot Italiano para niños
+- ✅ Recolección de leads empresariales y generales
+- ✅ Tracking de uso de aplicaciones
+- ✅ Generador de códigos QR portable
+- ✅ Limpieza de código (archivos no usados eliminados)
 
 ---
 

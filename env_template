@@ -10,3 +10,18 @@ OPENAI_API_KEY=
 # MAX_TOKENS=1000
 # TEMPERATURE=0.7
 
+# ============================================
+# CONFIGURACIÓN DE EMAIL (Gmail SMTP)
+# ============================================
+# Para obtener la contraseña de aplicación:
+# 1. Ve a: https://myaccount.google.com/security
+# 2. Activa "Verificación en 2 pasos" (si no está activada)
+# 3. Ve a "Contraseñas de aplicaciones"
+# 4. Genera una contraseña para "Correo" → "Otro (Inapsis Diagnostico)"
+# 5. Copia la contraseña de 16 caracteres aquí
+# ============================================
+SMTP_EMAIL=inapsis.info@gmail.com
+SMTP_PASSWORD=
+# SMTP_SERVER=smtp.gmail.com (por defecto)
+# SMTP_PORT=587 (por defecto)
+

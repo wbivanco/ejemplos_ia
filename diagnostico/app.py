@@ -8,6 +8,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from utils.openai_client import get_openai_client
 from utils.db import get_db
+from utils.email_service import get_email_service
 
 # Configuración de la página (solo si no está en modo unificado)
 if 'is_unified_app' not in st.session_state:
@@ -281,6 +282,8 @@ El tono debe ser profesional pero cercano, con recomendaciones prácticas y acci
                                     if line.strip() and len(line.strip()) > 10:
                                         oportunidades.append(line.strip())
                         
+                        oportunidades_texto = '\n'.join(oportunidades) if oportunidades else None
+                        
                         # Guardar en la base de datos - Lead empresarial
                         db = get_db()
                         try:
@@ -299,7 +302,7 @@ El tono debe ser profesional pero cercano, con recomendaciones prácticas y acci
                                 procesos_repetitivos=procesos,
                                 presupuesto_tecnologico=presupuesto,
                                 diagnostico_ia=resultado,
-                                oportunidades_identificadas=oportunidades if oportunidades else procesos,
+                                oportunidades_identificadas=oportunidades_texto if oportunidades_texto else ', '.join(procesos) if procesos else None,
                                 ip_address=ip_address
                             )
                             
@@ -312,6 +315,32 @@ El tono debe ser profesional pero cercano, con recomendaciones prácticas y acci
                             )
                         except Exception as db_error:
                             st.warning(f"⚠️ El diagnóstico se generó correctamente, pero hubo un problema al guardar tus datos: {str(db_error)}")
+                        
+                        # Enviar diagnóstico por email
+                        email_service = get_email_service()
+                        if email_service:
+                            try:
+                                with st.spinner("📧 Enviando diagnóstico por email..."):
+                                    success, message = email_service.enviar_diagnostico(
+                                        email_destino=email,
+                                        nombre=nombre,
+                                        empresa=empresa,
+                                        diagnostico=resultado,
+                                        oportunidades=oportunidades_texto
+                                    )
+                                    
+                                    if success:
+                                        st.session_state.email_enviado = True
+                                        st.session_state.email_mensaje = "✅ Tu diagnóstico ha sido enviado a tu email."
+                                    else:
+                                        st.session_state.email_enviado = False
+                                        st.session_state.email_mensaje = f"⚠️ {message}"
+                            except Exception as email_error:
+                                st.session_state.email_enviado = False
+                                st.session_state.email_mensaje = f"⚠️ No se pudo enviar el email: {str(email_error)}"
+                        else:
+                            st.session_state.email_enviado = False
+                            st.session_state.email_mensaje = "⚠️ El servicio de email no está configurado. El diagnóstico se muestra aquí pero no se envió por email."
                         
                         st.rerun()
                         
@@ -339,6 +368,14 @@ else:
     st.markdown(st.session_state.resultado)
     
     st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Mostrar estado del envío de email
+    if 'email_enviado' in st.session_state:
+        if st.session_state.email_enviado:
+            st.success(st.session_state.email_mensaje)
+        else:
+            st.warning(st.session_state.email_mensaje)
+            st.info("💡 Tu diagnóstico está disponible aquí abajo. Puedes copiarlo y guardarlo.")
     
     # Mensaje sobre consulta profesional
     st.markdown("---")

@@ -23,10 +23,6 @@ if 'is_unified_app' not in st.session_state:
 # Añadir el directorio raíz al path
 sys.path.insert(0, str(Path(__file__).parent))
 
-# Importar utilidades
-from utils.openai_client import get_openai_client
-from utils.db import get_db
-
 # Estilos CSS con paleta Inapsis
 st.markdown("""
     <style>
