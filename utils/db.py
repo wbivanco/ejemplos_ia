@@ -1,19 +1,70 @@
 """Gestión de base de datos SQLite para logs y resultados"""
 import sqlite3
 import json
+import time
 from datetime import datetime
 from pathlib import Path
 
 class EventDB:
     """Gestor de base de datos para el evento"""
     
-    def __init__(self, db_path="evento_inapsis.db"):
+    def __init__(self, db_path="evento_inapsis.db", timeout=20.0):
+        """
+        Inicializa el gestor de base de datos
+        
+        Args:
+            db_path: Ruta al archivo de base de datos
+            timeout: Tiempo máximo de espera para operaciones bloqueadas (segundos)
+        """
         self.db_path = db_path
+        self.timeout = timeout
         self._init_db()
+    
+    def _get_connection(self):
+        """
+        Obtiene una conexión a la base de datos con configuración para concurrencia
+        
+        Returns:
+            sqlite3.Connection: Conexión configurada
+        """
+        conn = sqlite3.connect(
+            self.db_path,
+            timeout=self.timeout,
+            check_same_thread=False  # Permite uso desde múltiples threads
+        )
+        # Optimizaciones para mejor rendimiento concurrente
+        conn.execute("PRAGMA journal_mode=WAL")  # Write-Ahead Logging para mejor concurrencia
+        conn.execute("PRAGMA synchronous=NORMAL")  # Balance entre seguridad y velocidad
+        conn.execute("PRAGMA busy_timeout=20000")  # 20 segundos de timeout
+        return conn
+    
+    def _execute_with_retry(self, operation, max_retries=3, retry_delay=0.1):
+        """
+        Ejecuta una operación de base de datos con reintentos automáticos
+        
+        Args:
+            operation: Función que ejecuta la operación (debe recibir conn como parámetro)
+            max_retries: Número máximo de reintentos
+            retry_delay: Tiempo de espera entre reintentos (segundos)
+        
+        Returns:
+            Resultado de la operación
+        """
+        for attempt in range(max_retries):
+            try:
+                with self._get_connection() as conn:
+                    return operation(conn)
+            except sqlite3.OperationalError as e:
+                if "locked" in str(e).lower() and attempt < max_retries - 1:
+                    time.sleep(retry_delay * (attempt + 1))  # Backoff exponencial
+                    continue
+                raise
+            except Exception:
+                raise
     
     def _init_db(self):
         """Inicializa las tablas de la base de datos"""
-        with sqlite3.connect(self.db_path) as conn:
+        def init_tables(conn):
             cursor = conn.cursor()
             
             # Tabla para interacciones generales
@@ -88,6 +139,8 @@ class EventDB:
             """)
             
             conn.commit()
+        
+        self._execute_with_retry(init_tables)
     
     def log_interaccion(self, app_name, user_data=None, result=None, tokens_used=0):
         """
@@ -99,7 +152,7 @@ class EventDB:
             result: Resultado de la interacción
             tokens_used: Cantidad de tokens consumidos
         """
-        with sqlite3.connect(self.db_path) as conn:
+        def insert_interaccion(conn):
             cursor = conn.cursor()
             
             user_data_str = json.dumps(user_data) if isinstance(user_data, dict) else user_data
@@ -117,18 +170,22 @@ class EventDB:
             ))
             
             conn.commit()
+        
+        self._execute_with_retry(insert_interaccion)
     
     def log_juego_resultado(self, aciertos, total):
         """Registra el resultado de un juego"""
         porcentaje = (aciertos / total * 100) if total > 0 else 0
         
-        with sqlite3.connect(self.db_path) as conn:
+        def insert_resultado(conn):
             cursor = conn.cursor()
             cursor.execute("""
                 INSERT INTO juego_resultados (timestamp, aciertos, total, porcentaje)
                 VALUES (?, ?, ?, ?)
             """, (datetime.now().isoformat(), aciertos, total, porcentaje))
             conn.commit()
+        
+        self._execute_with_retry(insert_resultado)
     
     def save_lead_empresarial(self, email, nombre, empresa, telefono, tipo_negocio, 
                               tamano_empresa, desafio_principal, procesos_repetitivos,
@@ -151,7 +208,7 @@ class EventDB:
             oportunidades_identificadas: Oportunidades identificadas (JSON string)
             ip_address: Dirección IP (opcional)
         """
-        with sqlite3.connect(self.db_path) as conn:
+        def insert_or_update_lead(conn):
             cursor = conn.cursor()
             
             # Convertir listas a JSON si es necesario
@@ -188,6 +245,8 @@ class EventDB:
                 ))
                 conn.commit()
                 return True
+        
+        return self._execute_with_retry(insert_or_update_lead)
     
     def save_lead_general(self, nombre, profesion, hobby, rasgo_dominante, estilo_preferido,
                           descripcion_superheroe, email=None, recibir_por_email=False):
@@ -204,7 +263,7 @@ class EventDB:
             email: Email del usuario (opcional)
             recibir_por_email: Si desea recibir el superhéroe por email
         """
-        with sqlite3.connect(self.db_path) as conn:
+        def insert_lead(conn):
             cursor = conn.cursor()
             
             cursor.execute("""
@@ -218,10 +277,12 @@ class EventDB:
             ))
             conn.commit()
             return True
+        
+        return self._execute_with_retry(insert_lead)
     
     def get_leads_empresariales(self):
         """Obtiene todos los leads empresariales"""
-        with sqlite3.connect(self.db_path) as conn:
+        def get_leads(conn):
             cursor = conn.cursor()
             cursor.execute("""
                 SELECT * FROM leads_empresariales
@@ -229,10 +290,12 @@ class EventDB:
             """)
             columns = [description[0] for description in cursor.description]
             return [dict(zip(columns, row)) for row in cursor.fetchall()]
+        
+        return self._execute_with_retry(get_leads)
     
     def get_leads_generales(self):
         """Obtiene todos los leads generales con email"""
-        with sqlite3.connect(self.db_path) as conn:
+        def get_leads(conn):
             cursor = conn.cursor()
             cursor.execute("""
                 SELECT * FROM leads_generales
@@ -241,6 +304,8 @@ class EventDB:
             """)
             columns = [description[0] for description in cursor.description]
             return [dict(zip(columns, row)) for row in cursor.fetchall()]
+        
+        return self._execute_with_retry(get_leads)
     
     def log_uso_app(self, app_name, accion="inicio", datos_adicionales=None):
         """
@@ -251,7 +316,7 @@ class EventDB:
             accion: Acción realizada (inicio, completado, cancelado, etc.)
             datos_adicionales: Datos adicionales en formato dict (se convierte a JSON)
         """
-        with sqlite3.connect(self.db_path) as conn:
+        def insert_uso(conn):
             cursor = conn.cursor()
             
             datos_str = json.dumps(datos_adicionales) if isinstance(datos_adicionales, dict) else datos_adicionales
@@ -266,10 +331,12 @@ class EventDB:
                 datos_str
             ))
             conn.commit()
+        
+        self._execute_with_retry(insert_uso)
     
     def get_stats(self):
         """Obtiene estadísticas generales del evento"""
-        with sqlite3.connect(self.db_path) as conn:
+        def get_statistics(conn):
             cursor = conn.cursor()
             
             # Total de interacciones por app
@@ -375,6 +442,8 @@ class EventDB:
                 "empresas_por_tamano": dict(empresas_por_tamano),
                 "empresas_por_tipo": dict(empresas_por_tipo)
             }
+        
+        return self._execute_with_retry(get_statistics)
 
 # Instancia global
 def get_db():

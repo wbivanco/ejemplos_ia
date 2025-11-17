@@ -20,6 +20,11 @@ st.set_page_config(
 if 'is_unified_app' not in st.session_state:
     st.session_state.is_unified_app = True
 
+# Identificador único de sesión para aislar cada usuario
+import uuid
+if 'session_id' not in st.session_state:
+    st.session_state.session_id = str(uuid.uuid4())
+
 # Añadir el directorio raíz al path
 sys.path.insert(0, str(Path(__file__).parent))
 
@@ -105,7 +110,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Inicializar session state para navegación
+# Inicializar session state para navegación (solo si no existe)
+# Esto previene que se reinicialice cuando otro usuario interactúa
 if 'pagina_actual' not in st.session_state:
     # Leer parámetro de URL si existe (compatible con Streamlit 1.28.2)
     try:
@@ -128,6 +134,19 @@ if 'pagina_actual' not in st.session_state:
             st.session_state.pagina_actual = 'home'
     except:
         st.session_state.pagina_actual = 'home'
+else:
+    # Si ya existe, verificar si hay un cambio en la URL (solo para navegación directa)
+    try:
+        if hasattr(st, 'query_params'):
+            query_params = st.query_params
+            if 'pagina_actual' in query_params and query_params['pagina_actual'] != st.session_state.pagina_actual:
+                st.session_state.pagina_actual = query_params['pagina_actual']
+        elif hasattr(st, 'experimental_get_query_params'):
+            query_params = st.experimental_get_query_params()
+            if 'pagina_actual' in query_params and query_params['pagina_actual'][0] != st.session_state.pagina_actual:
+                st.session_state.pagina_actual = query_params['pagina_actual'][0]
+    except:
+        pass  # Mantener el estado actual si hay error
 
 # Sidebar para navegación
 with st.sidebar:
