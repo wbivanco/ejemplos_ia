@@ -7,16 +7,11 @@ import random
 # Añadir el directorio raíz al path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-# Configuración de la página (solo si no está en modo unificado)
-if 'is_unified_app' not in st.session_state:
-    st.set_page_config(
-        page_title="Juego de Lógica",
-        page_icon="🧩",
-        layout="wide"
-    )
-
-# Estilos CSS con paleta Inapsis
-st.markdown("""
+def run_logica_app():
+    """Función principal de la app de juego de lógica"""
+    
+    # Estilos CSS con paleta Inapsis
+    st.markdown("""
     <style>
     .main-title {
         text-align: center;
@@ -87,23 +82,23 @@ st.markdown("""
         }
     }
     </style>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
-# Inicializar session state
-if 'logica_iniciado' not in st.session_state:
-    st.session_state.logica_iniciado = False
-if 'pregunta_actual' not in st.session_state:
-    st.session_state.pregunta_actual = 0
-if 'puntaje' not in st.session_state:
-    st.session_state.puntaje = 0
-if 'respondido' not in st.session_state:
-    st.session_state.respondido = False
+    # Inicializar session state
+    if 'logica_iniciado' not in st.session_state:
+        st.session_state.logica_iniciado = False
+    if 'pregunta_actual' not in st.session_state:
+        st.session_state.pregunta_actual = 0
+    if 'puntaje' not in st.session_state:
+        st.session_state.puntaje = 0
+    if 'respondido' not in st.session_state:
+        st.session_state.respondido = False
 
-# Importar db para estadísticas
-from utils.db import get_db
+    # Importar db para estadísticas
+    from utils.db import get_db
 
-# Base de datos de desafíos de lógica
-DESAFIOS = [
+    # Base de datos de desafíos de lógica
+    DESAFIOS = [
     {
         "tipo": "secuencia",
         "pregunta": "¿Qué número sigue en la secuencia?",
@@ -735,23 +730,23 @@ DESAFIOS = [
         "respuesta_correcta": 2,  # Índice 2 = "32"
         "explicacion": "50 fotos - 18 pegadas = 32 fotos restantes"
     }
-]
+    ]
 
-# Header
-st.markdown("""
+    # Header
+    st.markdown("""
     <div class="main-title">
         <h1>🧩 Juego de Lógica</h1>
         <p>Demuestra tu Inteligencia Natural - Sin IA, solo tu mente</p>
     </div>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
-# Pantalla de inicio
-if not st.session_state.logica_iniciado:
-    col1, col2, col3 = st.columns([1, 2, 1])
-    
-    with col2:
-        st.markdown("""
-        ### 🎯 ¿Qué es esto?
+    # Pantalla de inicio
+    if not st.session_state.logica_iniciado:
+        col1, col2, col3 = st.columns([1, 2, 1])
+        
+        with col2:
+            st.markdown("""
+            ### 🎯 ¿Qué es esto?
         
         Este juego **NO usa Inteligencia Artificial**. 
         
@@ -795,170 +790,182 @@ if not st.session_state.logica_iniciado:
                 pass
             st.rerun()
 
-# Juego en progreso
-elif st.session_state.pregunta_actual < len(st.session_state.desafios):
-    desafio = st.session_state.desafios[st.session_state.pregunta_actual]
-    total_preguntas = len(st.session_state.desafios)
-    
-    # Barra de progreso y puntuación
-    col1, col2 = st.columns([3, 1])
-    
-    with col1:
-        progreso = (st.session_state.pregunta_actual + 1) / total_preguntas
-        st.progress(progreso)
-        st.markdown(f"**Pregunta {st.session_state.pregunta_actual + 1} de {total_preguntas}**")
-    
-    with col2:
-        st.markdown(f"""
-        <div class="score-display">
-            <h3 style="margin: 0; color: white;">{st.session_state.puntaje}</h3>
-            <p style="margin: 0; font-size: 0.9rem;">Puntos</p>
+    # Juego en progreso
+    elif st.session_state.pregunta_actual < len(st.session_state.desafios):
+        desafio = st.session_state.desafios[st.session_state.pregunta_actual]
+        total_preguntas = len(st.session_state.desafios)
+        
+        # Barra de progreso y puntuación
+        col1, col2 = st.columns([3, 1])
+        
+        with col1:
+            progreso = (st.session_state.pregunta_actual + 1) / total_preguntas
+            st.progress(progreso)
+            st.markdown(f"**Pregunta {st.session_state.pregunta_actual + 1} de {total_preguntas}**")
+        
+        with col2:
+            st.markdown(f"""
+            <div class="score-display">
+                <h3 style="margin: 0; color: white;">{st.session_state.puntaje}</h3>
+                <p style="margin: 0; font-size: 0.9rem;">Puntos</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        # Mostrar desafío
+        st.markdown('<div class="challenge-card">', unsafe_allow_html=True)
+        st.markdown(f"### {desafio['pregunta']}")
+        
+        if desafio['datos']:
+            st.markdown(f"""
+            <div class="answer-box">
+                <p style="font-size: 1.5rem; text-align: center; margin: 0;">
+                    <strong>{desafio['datos']}</strong>
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        if not st.session_state.respondido:
+            # Botones de respuesta
+            st.markdown("### 👇 Elige tu respuesta:")
+            
+            col1, col2 = st.columns(2)
+            
+            for i, opcion in enumerate(desafio['opciones']):
+                col = col1 if i % 2 == 0 else col2
+                with col:
+                    if st.button(f"{opcion}", use_container_width=True, key=f"opcion_{i}"):
+                        st.session_state.respuesta_usuario = i
+                        st.session_state.respondido = True
+                        
+                        if i == desafio['respuesta_correcta']:
+                            st.session_state.puntaje += 1
+                        
+                        st.rerun()
+        else:
+            # Mostrar resultado
+            correcto = st.session_state.respuesta_usuario == desafio['respuesta_correcta']
+            
+            if correcto:
+                st.markdown(f"""
+                <div class="correct-answer">
+                    <h3>✅ ¡Correcto!</h3>
+                    <p><strong>Respuesta correcta:</strong> {desafio['opciones'][desafio['respuesta_correcta']]}</p>
+                    <p><strong>Explicación:</strong> {desafio['explicacion']}</p>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
+                <div class="wrong-answer">
+                    <h3>❌ Incorrecto</h3>
+                    <p><strong>Tu respuesta:</strong> {desafio['opciones'][st.session_state.respuesta_usuario]}</p>
+                    <p><strong>Respuesta correcta:</strong> {desafio['opciones'][desafio['respuesta_correcta']]}</p>
+                    <p><strong>Explicación:</strong> {desafio['explicacion']}</p>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            st.markdown("---")
+            
+            if st.button("➡️ Siguiente Pregunta", use_container_width=True, type="primary"):
+                st.session_state.pregunta_actual += 1
+                st.session_state.respondido = False
+                st.rerun()
+
+    # Pantalla final
+    else:
+        porcentaje = (st.session_state.puntaje / len(st.session_state.desafios)) * 100
+        
+        st.markdown("""
+        <div class="main-title">
+            <h1>🎉 ¡Juego Completado!</h1>
         </div>
         """, unsafe_allow_html=True)
-    
-    # Mostrar desafío
-    st.markdown('<div class="challenge-card">', unsafe_allow_html=True)
-    st.markdown(f"### {desafio['pregunta']}")
-    
-    if desafio['datos']:
+        
         st.markdown(f"""
-        <div class="answer-box">
-            <p style="font-size: 1.5rem; text-align: center; margin: 0;">
-                <strong>{desafio['datos']}</strong>
+        <div class="score-display">
+            <h2 style="color: white; margin: 0;">Puntaje Final</h2>
+            <h1 style="color: white; font-size: 4rem; margin: 1rem 0;">
+                {st.session_state.puntaje} / {len(st.session_state.desafios)}
+            </h1>
+            <p style="font-size: 1.5rem; margin: 0;">
+                {porcentaje:.0f}% de aciertos
             </p>
         </div>
         """, unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    if not st.session_state.respondido:
-        # Botones de respuesta
-        st.markdown("### 👇 Elige tu respuesta:")
         
-        col1, col2 = st.columns(2)
-        
-        for i, opcion in enumerate(desafio['opciones']):
-            col = col1 if i % 2 == 0 else col2
-            with col:
-                if st.button(f"{opcion}", use_container_width=True, key=f"opcion_{i}"):
-                    st.session_state.respuesta_usuario = i
-                    st.session_state.respondido = True
-                    
-                    if i == desafio['respuesta_correcta']:
-                        st.session_state.puntaje += 1
-                    
-                    st.rerun()
-    else:
-        # Mostrar resultado
-        correcto = st.session_state.respuesta_usuario == desafio['respuesta_correcta']
-        
-        if correcto:
-            st.markdown(f"""
-            <div class="correct-answer">
-                <h3>✅ ¡Correcto!</h3>
-                <p><strong>Respuesta correcta:</strong> {desafio['opciones'][desafio['respuesta_correcta']]}</p>
-                <p><strong>Explicación:</strong> {desafio['explicacion']}</p>
-            </div>
-            """, unsafe_allow_html=True)
+        # Mensaje según puntaje
+        if porcentaje >= 90:
+            mensaje = "🌟 ¡Excelente! Tu inteligencia natural es excepcional"
+            emoji = "🧠✨"
+        elif porcentaje >= 70:
+            mensaje = "👍 ¡Muy bien! Tienes buena capacidad de razonamiento"
+            emoji = "💪"
+        elif porcentaje >= 50:
+            mensaje = "👏 Bien hecho. Sigue practicando tu lógica"
+            emoji = "📚"
         else:
-            st.markdown(f"""
-            <div class="wrong-answer">
-                <h3>❌ Incorrecto</h3>
-                <p><strong>Tu respuesta:</strong> {desafio['opciones'][st.session_state.respuesta_usuario]}</p>
-                <p><strong>Respuesta correcta:</strong> {desafio['opciones'][desafio['respuesta_correcta']]}</p>
-                <p><strong>Explicación:</strong> {desafio['explicacion']}</p>
-            </div>
-            """, unsafe_allow_html=True)
+            mensaje = "💪 No te rindas. La práctica mejora el razonamiento"
+            emoji = "🎯"
+        
+        st.markdown(f"""
+        <div class="challenge-card" style="text-align: center;">
+            <h2>{emoji}</h2>
+            <h3>{mensaje}</h3>
+            <p style="font-size: 1.1rem; color: #666;">
+                Recuerda: Esta es tu <strong>inteligencia natural</strong>, no IA.
+                <br>Tu mente humana tiene habilidades únicas que las máquinas no pueden replicar.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Registrar completado del juego
+        try:
+            db = get_db()
+            db.log_uso_app("Juego de Lógica", "completado", {
+                "puntaje": st.session_state.puntaje,
+                "total": len(st.session_state.desafios),
+                "porcentaje": porcentaje
+            })
+            db.log_interaccion(
+                app_name="Juego de Lógica",
+                user_data={"puntaje": st.session_state.puntaje, "total": len(st.session_state.desafios)},
+                result=f"Puntuación: {porcentaje:.0f}%",
+                tokens_used=0  # No usa IA
+            )
+        except:
+            pass
         
         st.markdown("---")
         
-        if st.button("➡️ Siguiente Pregunta", use_container_width=True, type="primary"):
-            st.session_state.pregunta_actual += 1
-            st.session_state.respondido = False
-            st.rerun()
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            if st.button("🔄 Jugar de Nuevo", use_container_width=True, type="primary"):
+                st.session_state.logica_iniciado = False
+                st.session_state.pregunta_actual = 0
+                st.session_state.puntaje = 0
+                st.session_state.respondido = False
+                st.rerun()
 
-# Pantalla final
-else:
-    porcentaje = (st.session_state.puntaje / len(st.session_state.desafios)) * 100
-    
-    st.markdown("""
-    <div class="main-title">
-        <h1>🎉 ¡Juego Completado!</h1>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    st.markdown(f"""
-    <div class="score-display">
-        <h2 style="color: white; margin: 0;">Puntaje Final</h2>
-        <h1 style="color: white; font-size: 4rem; margin: 1rem 0;">
-            {st.session_state.puntaje} / {len(st.session_state.desafios)}
-        </h1>
-        <p style="font-size: 1.5rem; margin: 0;">
-            {porcentaje:.0f}% de aciertos
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Mensaje según puntaje
-    if porcentaje >= 90:
-        mensaje = "🌟 ¡Excelente! Tu inteligencia natural es excepcional"
-        emoji = "🧠✨"
-    elif porcentaje >= 70:
-        mensaje = "👍 ¡Muy bien! Tienes buena capacidad de razonamiento"
-        emoji = "💪"
-    elif porcentaje >= 50:
-        mensaje = "👏 Bien hecho. Sigue practicando tu lógica"
-        emoji = "📚"
-    else:
-        mensaje = "💪 No te rindas. La práctica mejora el razonamiento"
-        emoji = "🎯"
-    
-    st.markdown(f"""
-    <div class="challenge-card" style="text-align: center;">
-        <h2>{emoji}</h2>
-        <h3>{mensaje}</h3>
-        <p style="font-size: 1.1rem; color: #666;">
-            Recuerda: Esta es tu <strong>inteligencia natural</strong>, no IA.
-            <br>Tu mente humana tiene habilidades únicas que las máquinas no pueden replicar.
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Registrar completado del juego
-    try:
-        db = get_db()
-        db.log_uso_app("Juego de Lógica", "completado", {
-            "puntaje": st.session_state.puntaje,
-            "total": len(st.session_state.desafios),
-            "porcentaje": porcentaje
-        })
-        db.log_interaccion(
-            app_name="Juego de Lógica",
-            user_data={"puntaje": st.session_state.puntaje, "total": len(st.session_state.desafios)},
-            result=f"Puntuación: {porcentaje:.0f}%",
-            tokens_used=0  # No usa IA
+        # Botón volver al portal
+        st.markdown("---")
+
+        if 'is_unified_app' in st.session_state and st.session_state.is_unified_app:
+            if st.button("🏠 Volver al Portal", use_container_width=True):
+                st.session_state.pagina_actual = 'home'
+                st.rerun()
+        else:
+            st.info("💡 **Modo standalone**: Ejecuta `streamlit run app_unificada.py` para acceder al portal completo")
+
+# Para ejecución standalone
+if __name__ == "__main__" or ('is_unified_app' not in st.session_state or 
+                               st.session_state.get('is_unified_app') is None):
+    # Configuración de página solo si no está en modo unificado
+    if 'is_unified_app' not in st.session_state:
+        st.set_page_config(
+            page_title="Juego de Lógica",
+            page_icon="🧩",
+            layout="wide"
         )
-    except:
-        pass
-    
-    st.markdown("---")
-    
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        if st.button("🔄 Jugar de Nuevo", use_container_width=True, type="primary"):
-            st.session_state.logica_iniciado = False
-            st.session_state.pregunta_actual = 0
-            st.session_state.puntaje = 0
-            st.session_state.respondido = False
-            st.rerun()
-
-# Botón volver al portal
-st.markdown("---")
-
-if 'is_unified_app' in st.session_state and st.session_state.is_unified_app:
-    if st.button("🏠 Volver al Portal", use_container_width=True):
-        st.session_state.pagina_actual = 'home'
-        st.rerun()
-else:
-    st.info("💡 **Modo standalone**: Ejecuta `streamlit run app_unificada.py` para acceder al portal completo")
+    run_logica_app()
 

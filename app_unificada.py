@@ -200,31 +200,38 @@ with st.sidebar:
 # Mostrar la página correspondiente
 if st.session_state.pagina_actual == 'home':
     # Importar y mostrar el portal principal
-    exec(open('main_menu.py').read())
+    from main_menu import run_main_menu
+    run_main_menu()
 
 elif st.session_state.pagina_actual == 'diagnostico':
     # Importar la app de diagnóstico
-    exec(open('diagnostico/app.py').read())
+    from diagnostico.app import run_diagnostico_app
+    run_diagnostico_app()
 
 elif st.session_state.pagina_actual == 'gemelo':
     # Importar la app de Generador de Superhéroes
-    exec(open('gemelo/app.py').read())
+    from gemelo.app import run_gemelo_app
+    run_gemelo_app()
 
 # JUEGO IA - COMENTADO (juego para niños deshabilitado temporalmente)
 # elif st.session_state.pagina_actual == 'juego':
 #     # Importar la app de juego
-#     exec(open('juego/app.py').read())
+#     from juego.app import run_juego_app
+#     run_juego_app()
 
 elif st.session_state.pagina_actual == 'logica':
     # Importar la app de lógica
-    exec(open('logica/app.py').read())
+    from logica.app import run_logica_app
+    run_logica_app()
 
 elif st.session_state.pagina_actual == 'brainrot':
     # Importar la app de brainrot italiano
-    exec(open('brainrot/app.py').read())
+    from brainrot.app import run_brainrot_app
+    run_brainrot_app()
 
 elif st.session_state.pagina_actual == 'estadisticas':
     # Importar la app de estadísticas
-    exec(open('estadisticas/app.py').read())
+    from estadisticas.app import run_estadisticas_app
+    run_estadisticas_app()
 
 

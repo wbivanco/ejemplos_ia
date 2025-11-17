@@ -12,16 +12,11 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from utils.db import get_db
 
-# Configuración de la página (solo si no está en modo unificado)
-if 'is_unified_app' not in st.session_state:
-    st.set_page_config(
-        page_title="Estadísticas - Inapsis",
-        page_icon="📊",
-        layout="wide"
-    )
-
-# Estilos CSS con paleta Inapsis
-st.markdown("""
+def run_estadisticas_app():
+    """Función principal de la app de estadísticas"""
+    
+    # Estilos CSS con paleta Inapsis
+    st.markdown("""
     <style>
     .main-title {
         text-align: center;
@@ -73,49 +68,49 @@ st.markdown("""
         }
     }
     </style>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
-# Header
-st.markdown("""
+    # Header
+    st.markdown("""
     <div class="main-title">
         <h1>📊 Dashboard de Estadísticas</h1>
         <p>Métricas y análisis del evento Inapsis</p>
     </div>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
-# Obtener estadísticas
-try:
-    db = get_db()
-    stats = db.get_stats()
+    # Obtener estadísticas
+    try:
+        db = get_db()
+        stats = db.get_stats()
+        
+        # ========== RESUMEN GENERAL ==========
+        st.markdown('<div class="section-header"><h2>📈 Resumen General</h2></div>', unsafe_allow_html=True)
     
-    # ========== RESUMEN GENERAL ==========
-    st.markdown('<div class="section-header"><h2>📈 Resumen General</h2></div>', unsafe_allow_html=True)
+        col1, col2, col3, col4 = st.columns(4)
     
-    col1, col2, col3, col4 = st.columns(4)
+        inicios = stats.get('inicios_por_app', {})
+        completados = stats.get('completados_por_app', {})
+        total_inicios = sum(inicios.values())
+        total_completados = sum(completados.values())
     
-    inicios = stats.get('inicios_por_app', {})
-    completados = stats.get('completados_por_app', {})
-    total_inicios = sum(inicios.values())
-    total_completados = sum(completados.values())
-    
-    with col1:
-        st.markdown("""
+        with col1:
+            st.markdown("""
         <div class="stat-card">
             <h3>🎮 Apps Iniciadas</h3>
             <p class="number">{}</p>
         </div>
         """.format(total_inicios), unsafe_allow_html=True)
     
-    with col2:
-        st.markdown("""
+        with col2:
+            st.markdown("""
         <div class="stat-card">
             <h3>✅ Apps Completadas</h3>
             <p class="number">{}</p>
         </div>
         """.format(total_completados), unsafe_allow_html=True)
     
-    with col3:
-        tasa = (total_completados / total_inicios * 100) if total_inicios > 0 else 0
+        with col3:
+            tasa = (total_completados / total_inicios * 100) if total_inicios > 0 else 0
         st.markdown("""
         <div class="stat-card">
             <h3>📊 Tasa de Completado</h3>
@@ -123,8 +118,8 @@ try:
         </div>
         """.format(tasa), unsafe_allow_html=True)
     
-    with col4:
-        total_leads = stats.get('total_leads_empresariales', 0) + stats.get('total_leads_generales', 0)
+        with col4:
+            total_leads = stats.get('total_leads_empresariales', 0) + stats.get('total_leads_generales', 0)
         st.markdown("""
         <div class="stat-card">
             <h3>📧 Total Leads</h3>
@@ -132,19 +127,19 @@ try:
         </div>
         """.format(total_leads), unsafe_allow_html=True)
     
-    # ========== USO POR APLICACIÓN ==========
-    st.markdown('<div class="section-header"><h2>🎮 Uso por Aplicación</h2></div>', unsafe_allow_html=True)
+        # ========== USO POR APLICACIÓN ==========
+        st.markdown('<div class="section-header"><h2>🎮 Uso por Aplicación</h2></div>', unsafe_allow_html=True)
     
-    apps_info = {
+        apps_info = {
         "Diagnóstico Empresarial": {"emoji": "💼", "color": "#8B7BC8"},
         "Generador de Superhéroes": {"emoji": "🦸", "color": "#FF6B5A"},
         "Generador de Brainrot Italiano": {"emoji": "🍝", "color": "#FF9800"},
         # "Juego IA": {"emoji": "🎮", "color": "#4CAF50"},  # COMENTADO - Juego para niños deshabilitado
         "Juego de Lógica": {"emoji": "🧩", "color": "#2196F3"}
-    }
+        }
     
-    for app_name, info in apps_info.items():
-        total_inicios_app = inicios.get(app_name, 0)
+        for app_name, info in apps_info.items():
+            total_inicios_app = inicios.get(app_name, 0)
         total_completados_app = completados.get(app_name, 0)
         tasa_app = (total_completados_app / total_inicios_app * 100) if total_inicios_app > 0 else 0
         
@@ -178,32 +173,32 @@ try:
             </div>
             """, unsafe_allow_html=True)
     
-    # ========== ESTADÍSTICAS DE JUEGOS ==========
-    st.markdown('<div class="section-header"><h2>🎯 Estadísticas de Juegos</h2></div>', unsafe_allow_html=True)
+        # ========== ESTADÍSTICAS DE JUEGOS ==========
+        st.markdown('<div class="section-header"><h2>🎯 Estadísticas de Juegos</h2></div>', unsafe_allow_html=True)
     
-    # JUEGO IA - COMENTADO (juego para niños deshabilitado temporalmente)
-    # col_j1, col_j2 = st.columns(2)
-    # 
-    # with col_j1:
-    #     total_partidas_ia = stats.get('total_partidas_juego_ia', 0)
-    #     promedio_ia = stats.get('promedio_aciertos_juego_ia', 0)
-    #     
-    #     st.markdown("""
-    #     <div class="stat-card">
-    #         <h3>🎮 Juego IA - ¿Foto Real o IA?</h3>
-    #         <p style="font-size: 1.5rem; color: #4CAF50; font-weight: 600; margin: 0.5rem 0;">
-    #             Partidas: <strong>{}</strong>
-    #         </p>
-    #         <p style="font-size: 1.2rem; color: #666; margin: 0.5rem 0;">
-    #             Promedio de aciertos: <strong>{:.1f}%</strong>
-    #         </p>
-    #     </div>
-    #     """.format(total_partidas_ia, promedio_ia), unsafe_allow_html=True)
+        # JUEGO IA - COMENTADO (juego para niños deshabilitado temporalmente)
+        # col_j1, col_j2 = st.columns(2)
+        # 
+        # with col_j1:
+        #     total_partidas_ia = stats.get('total_partidas_juego_ia', 0)
+        #     promedio_ia = stats.get('promedio_aciertos_juego_ia', 0)
+        #     
+        #     st.markdown("""
+        #     <div class="stat-card">
+        #         <h3>🎮 Juego IA - ¿Foto Real o IA?</h3>
+        #         <p style="font-size: 1.5rem; color: #4CAF50; font-weight: 600; margin: 0.5rem 0;">
+        #             Partidas: <strong>{}</strong>
+        #         </p>
+        #         <p style="font-size: 1.2rem; color: #666; margin: 0.5rem 0;">
+        #             Promedio de aciertos: <strong>{:.1f}%</strong>
+        #         </p>
+        #     </div>
+        #     """.format(total_partidas_ia, promedio_ia), unsafe_allow_html=True)
     
-    # Solo mostrar Juego de Lógica
-    col_j2 = st.columns(1)[0]
-    with col_j2:
-        interacciones_logica = stats.get('interacciones_por_app', {}).get('Juego de Lógica', 0)
+        # Solo mostrar Juego de Lógica
+        col_j2 = st.columns(1)[0]
+        with col_j2:
+            interacciones_logica = stats.get('interacciones_por_app', {}).get('Juego de Lógica', 0)
         
         st.markdown("""
         <div class="stat-card">
@@ -217,67 +212,67 @@ try:
         </div>
         """.format(interacciones_logica), unsafe_allow_html=True)
     
-    # ========== LEADS EMPRESARIALES ==========
-    st.markdown('<div class="section-header"><h2>💼 Leads Empresariales</h2></div>', unsafe_allow_html=True)
+        # ========== LEADS EMPRESARIALES ==========
+        st.markdown('<div class="section-header"><h2>💼 Leads Empresariales</h2></div>', unsafe_allow_html=True)
     
-    total_leads_empresariales = stats.get('total_leads_empresariales', 0)
+        total_leads_empresariales = stats.get('total_leads_empresariales', 0)
     
-    if total_leads_empresariales > 0:
-        col_l1, col_l2 = st.columns(2)
-        
-        with col_l1:
-            st.markdown(f"""
-            <div class="stat-card">
-                <h3>📧 Total de Leads</h3>
-                <p class="number">{total_leads_empresariales}</p>
-            </div>
-            """, unsafe_allow_html=True)
+        if total_leads_empresariales > 0:
+            col_l1, col_l2 = st.columns(2)
             
-            empresas_por_tamano = stats.get('empresas_por_tamano', {})
-            if empresas_por_tamano:
-                st.markdown("#### Por Tamaño:")
-                for tamano, cantidad in empresas_por_tamano.items():
-                    porcentaje = (cantidad / total_leads_empresariales * 100)
-                    st.progress(porcentaje / 100)
-                    st.caption(f"{tamano}: {cantidad} ({porcentaje:.1f}%)")
-        
-        with col_l2:
-            empresas_por_tipo = stats.get('empresas_por_tipo', {})
-            if empresas_por_tipo:
-                st.markdown("#### Por Tipo de Negocio:")
-                for tipo, cantidad in empresas_por_tipo.items():
-                    porcentaje = (cantidad / total_leads_empresariales * 100)
-                    st.progress(porcentaje / 100)
-                    st.caption(f"{tipo}: {cantidad} ({porcentaje:.1f}%)")
-    else:
-        st.info("📭 Aún no hay leads empresariales registrados")
+            with col_l1:
+                st.markdown(f"""
+                <div class="stat-card">
+                    <h3>📧 Total de Leads</h3>
+                    <p class="number">{total_leads_empresariales}</p>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                empresas_por_tamano = stats.get('empresas_por_tamano', {})
+                if empresas_por_tamano:
+                    st.markdown("#### Por Tamaño:")
+                    for tamano, cantidad in empresas_por_tamano.items():
+                        porcentaje = (cantidad / total_leads_empresariales * 100)
+                        st.progress(porcentaje / 100)
+                        st.caption(f"{tamano}: {cantidad} ({porcentaje:.1f}%)")
+            
+            with col_l2:
+                empresas_por_tipo = stats.get('empresas_por_tipo', {})
+                if empresas_por_tipo:
+                    st.markdown("#### Por Tipo de Negocio:")
+                    for tipo, cantidad in empresas_por_tipo.items():
+                        porcentaje = (cantidad / total_leads_empresariales * 100)
+                        st.progress(porcentaje / 100)
+                        st.caption(f"{tipo}: {cantidad} ({porcentaje:.1f}%)")
+        else:
+            st.info("📭 Aún no hay leads empresariales registrados")
     
-    # ========== SUPERHÉROES ==========
-    st.markdown('<div class="section-header"><h2>🦸 Generador de Superhéroes</h2></div>', unsafe_allow_html=True)
+        # ========== SUPERHÉROES ==========
+        st.markdown('<div class="section-header"><h2>🦸 Generador de Superhéroes</h2></div>', unsafe_allow_html=True)
     
-    col_s1, col_s2, col_s3 = st.columns(3)
+        col_s1, col_s2, col_s3 = st.columns(3)
     
-    total_superheroes = stats.get('total_superheroes_generados', 0)
-    total_leads_generales = stats.get('total_leads_generales', 0)
+        total_superheroes = stats.get('total_superheroes_generados', 0)
+        total_leads_generales = stats.get('total_leads_generales', 0)
     
-    with col_s1:
-        st.markdown(f"""
+        with col_s1:
+            st.markdown(f"""
         <div class="stat-card">
             <h3>Total Generados</h3>
             <p class="number">{total_superheroes}</p>
         </div>
         """, unsafe_allow_html=True)
     
-    with col_s2:
-        st.markdown(f"""
+        with col_s2:
+            st.markdown(f"""
         <div class="stat-card">
             <h3>Con Email</h3>
             <p class="number">{total_leads_generales}</p>
         </div>
         """, unsafe_allow_html=True)
     
-    with col_s3:
-        tasa_email = (total_leads_generales / total_superheroes * 100) if total_superheroes > 0 else 0
+        with col_s3:
+            tasa_email = (total_leads_generales / total_superheroes * 100) if total_superheroes > 0 else 0
         st.markdown(f"""
         <div class="stat-card">
             <h3>Tasa de Captura</h3>
@@ -285,13 +280,13 @@ try:
         </div>
         """, unsafe_allow_html=True)
     
-    # ========== RECURSOS Y COSTOS ==========
-    st.markdown('<div class="section-header"><h2>⚙️ Recursos y Costos</h2></div>', unsafe_allow_html=True)
+        # ========== RECURSOS Y COSTOS ==========
+        st.markdown('<div class="section-header"><h2>⚙️ Recursos y Costos</h2></div>', unsafe_allow_html=True)
     
-    col_r1, col_r2 = st.columns(2)
+        col_r1, col_r2 = st.columns(2)
     
-    with col_r1:
-        total_tokens = stats.get('total_tokens_usados', 0)
+        with col_r1:
+            total_tokens = stats.get('total_tokens_usados', 0)
         st.markdown(f"""
         <div class="stat-card">
             <h3>🔢 Tokens Usados</h3>
@@ -299,34 +294,34 @@ try:
         </div>
         """, unsafe_allow_html=True)
     
-    with col_r2:
-        if total_tokens > 0:
-            # Estimación de costo (GPT-4o-mini: ~$0.0006 por 1K tokens de salida, ~$0.00015 por entrada)
-            # Usamos promedio de $0.0004 por 1K tokens (mix entrada/salida)
-            costo_estimado = (total_tokens / 1000) * 0.0004
-            st.markdown(f"""
-            <div class="stat-card">
-                <h3>💰 Costo Estimado</h3>
-                <p class="number">${costo_estimado:.2f}</p>
-                <p style="font-size: 0.8rem; color: #666; margin: 0.5rem 0 0 0;">USD (GPT-4o-mini)</p>
-            </div>
-            """, unsafe_allow_html=True)
-        else:
-            st.markdown("""
-            <div class="stat-card">
-                <h3>💰 Costo Estimado</h3>
-                <p class="number">$0.00</p>
-            </div>
-            """, unsafe_allow_html=True)
+        with col_r2:
+            if total_tokens > 0:
+                # Estimación de costo (GPT-4o-mini: ~$0.0006 por 1K tokens de salida, ~$0.00015 por entrada)
+                # Usamos promedio de $0.0004 por 1K tokens (mix entrada/salida)
+                costo_estimado = (total_tokens / 1000) * 0.0004
+                st.markdown(f"""
+                <div class="stat-card">
+                    <h3>💰 Costo Estimado</h3>
+                    <p class="number">${costo_estimado:.2f}</p>
+                    <p style="font-size: 0.8rem; color: #666; margin: 0.5rem 0 0 0;">USD (GPT-4o-mini)</p>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown("""
+                <div class="stat-card">
+                    <h3>💰 Costo Estimado</h3>
+                    <p class="number">$0.00</p>
+                </div>
+                """, unsafe_allow_html=True)
     
-    # ========== PESTAÑAS PARA LEADS ==========
-    st.markdown("---")
-    st.markdown('<div class="section-header"><h2>📋 Leads Detallados</h2></div>', unsafe_allow_html=True)
+        # ========== PESTAÑAS PARA LEADS ==========
+        st.markdown("---")
+        st.markdown('<div class="section-header"><h2>📋 Leads Detallados</h2></div>', unsafe_allow_html=True)
     
-    tab1, tab2 = st.tabs(["💼 Leads Empresariales", "🦸 Leads Generales"])
+        tab1, tab2 = st.tabs(["💼 Leads Empresariales", "🦸 Leads Generales"])
     
-    with tab1:
-        leads_empresariales = db.get_leads_empresariales()
+        with tab1:
+            leads_empresariales = db.get_leads_empresariales()
         
         if leads_empresariales:
             st.success(f"📊 Total: {len(leads_empresariales)} leads empresariales")
@@ -387,8 +382,8 @@ try:
         else:
             st.info("📭 Aún no hay leads empresariales registrados")
     
-    with tab2:
-        leads_generales = db.get_leads_generales()
+        with tab2:
+            leads_generales = db.get_leads_generales()
         
         if leads_generales:
             st.success(f"📊 Total: {len(leads_generales)} leads con email")
@@ -418,12 +413,12 @@ try:
         else:
             st.info("📭 Aún no hay leads generales con email registrados")
     
-    # ========== ACCIONES ==========
-    st.markdown("---")
+        # ========== ACCIONES ==========
+        st.markdown("---")
     
-    # Funciones para generar CSV en memoria
-    def generar_csv_empresariales():
-        """Genera CSV de leads empresariales en memoria"""
+        # Funciones para generar CSV en memoria
+        def generar_csv_empresariales():
+            """Genera CSV de leads empresariales en memoria"""
         leads = db.get_leads_empresariales()
         
         if not leads:
@@ -455,8 +450,8 @@ try:
         
         return output.getvalue()
     
-    def generar_csv_generales():
-        """Genera CSV de leads generales en memoria"""
+        def generar_csv_generales():
+            """Genera CSV de leads generales en memoria"""
         leads = db.get_leads_generales()
         
         if not leads:
@@ -484,57 +479,69 @@ try:
         
         return output.getvalue()
     
-    # Botones de acción
-    col_act1, col_act2, col_act3, col_act4 = st.columns(4)
+        # Botones de acción
+        col_act1, col_act2, col_act3, col_act4 = st.columns(4)
     
-    with col_act1:
-        if st.button("🔄 Actualizar Estadísticas", use_container_width=True):
-            st.rerun()
-    
-    with col_act2:
-        csv_empresariales = generar_csv_empresariales()
-        if csv_empresariales:
-            fecha = datetime.now().strftime('%Y%m%d_%H%M%S')
-            st.download_button(
-                label="📥 Exportar Leads Empresariales",
-                data=csv_empresariales,
-                file_name=f"leads_empresariales_{fecha}.csv",
-                mime="text/csv",
-                use_container_width=True
-            )
-        else:
-            st.button("📥 Exportar Leads Empresariales", disabled=True, use_container_width=True)
-    
-    with col_act3:
-        csv_generales = generar_csv_generales()
-        if csv_generales:
-            fecha = datetime.now().strftime('%Y%m%d_%H%M%S')
-            st.download_button(
-                label="🦸 Exportar Leads Generales",
-                data=csv_generales,
-                file_name=f"leads_generales_{fecha}.csv",
-                mime="text/csv",
-                use_container_width=True
-            )
-        else:
-            st.button("🦸 Exportar Leads Generales", disabled=True, use_container_width=True)
-    
-    with col_act4:
-        if st.button("🏠 Volver al Portal", use_container_width=True):
-            if 'is_unified_app' in st.session_state:
-                st.session_state.pagina_actual = 'home'
+        with col_act1:
+            if st.button("🔄 Actualizar Estadísticas", use_container_width=True):
                 st.rerun()
+        
+        with col_act2:
+            csv_empresariales = generar_csv_empresariales()
+            if csv_empresariales:
+                fecha = datetime.now().strftime('%Y%m%d_%H%M%S')
+                st.download_button(
+                    label="📥 Exportar Leads Empresariales",
+                    data=csv_empresariales,
+                    file_name=f"leads_empresariales_{fecha}.csv",
+                    mime="text/csv",
+                    use_container_width=True
+                )
+            else:
+                st.button("📥 Exportar Leads Empresariales", disabled=True, use_container_width=True)
+        
+        with col_act3:
+            csv_generales = generar_csv_generales()
+            if csv_generales:
+                fecha = datetime.now().strftime('%Y%m%d_%H%M%S')
+                st.download_button(
+                    label="🦸 Exportar Leads Generales",
+                    data=csv_generales,
+                    file_name=f"leads_generales_{fecha}.csv",
+                    mime="text/csv",
+                    use_container_width=True
+                )
+            else:
+                st.button("🦸 Exportar Leads Generales", disabled=True, use_container_width=True)
+        
+        with col_act4:
+            if st.button("🏠 Volver al Portal", use_container_width=True):
+                if 'is_unified_app' in st.session_state:
+                    st.session_state.pagina_actual = 'home'
+                    st.rerun()
     
-    # Footer
-    st.markdown("---")
-    st.markdown(f"""
-    <div style="text-align: center; color: #666; padding: 2rem 0;">
+        # Footer
+        st.markdown("---")
+        st.markdown(f"""
+        <div style="text-align: center; color: #666; padding: 2rem 0;">
         <p>📊 Dashboard de Estadísticas | Última actualización: {datetime.now().strftime('%d/%m/%Y %H:%M')}</p>
         <p style="font-size: 0.9rem;">Powered by Inapsis</p>
-    </div>
-    """, unsafe_allow_html=True)
+        </div>
+        """, unsafe_allow_html=True)
     
-except Exception as e:
-    st.error(f"❌ Error al cargar estadísticas: {str(e)}")
-    st.info("💡 Asegúrate de que la base de datos esté inicializada correctamente")
+    except Exception as e:
+        st.error(f"❌ Error al cargar estadísticas: {str(e)}")
+        st.info("💡 Asegúrate de que la base de datos esté inicializada correctamente")
+
+# Para ejecución standalone
+if __name__ == "__main__" or ('is_unified_app' not in st.session_state or 
+                               st.session_state.get('is_unified_app') is None):
+    # Configuración de página solo si no está en modo unificado
+    if 'is_unified_app' not in st.session_state:
+        st.set_page_config(
+            page_title="Estadísticas - Inapsis",
+            page_icon="📊",
+            layout="wide"
+        )
+    run_estadisticas_app()
 

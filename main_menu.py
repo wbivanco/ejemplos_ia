@@ -9,17 +9,11 @@ def get_image_base64(image_path):
     with open(image_path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-# Configuración de la página (solo si no está en modo unificado)
-if 'is_unified_app' not in st.session_state:
-    st.set_page_config(
-        page_title="Inapsis IA - Portal de Eventos",
-        page_icon="🧠",
-        layout="wide",
-        initial_sidebar_state="collapsed"
-    )
-
-# Estilos personalizados con paleta Inapsis
-st.markdown("""
+def run_main_menu():
+    """Función principal del portal principal"""
+    
+    # Estilos personalizados con paleta Inapsis
+    st.markdown("""
     <style>
     .logo-container {
         text-align: center;
@@ -123,246 +117,259 @@ st.markdown("""
         }
     }
     </style>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
-# Header principal - compacto sin scroll automático
-# Logo centrado con columnas y enlace
-logo_path = Path("assets/inapsis_logo.png")
-if logo_path.exists():
-    try:
-        col_l1, col_l2, col_l3 = st.columns([2, 1, 2])
-        with col_l2:
-            st.markdown(
-                f'<a href="https://inapsis.com.ar" target="_blank" style="display: block; text-align: center;">'
-                f'<img src="data:image/png;base64,{get_image_base64(str(logo_path))}" style="max-width: 200px; width: 100%; height: auto; cursor: pointer;"></a>',
-                unsafe_allow_html=True
-            )
-    except:
-        pass
+    # Header principal - compacto sin scroll automático
+    # Logo centrado con columnas y enlace
+    logo_path = Path("assets/inapsis_logo.png")
+    if logo_path.exists():
+        try:
+            col_l1, col_l2, col_l3 = st.columns([2, 1, 2])
+            with col_l2:
+                st.markdown(
+                    f'<a href="https://inapsis.com.ar" target="_blank" style="display: block; text-align: center;">'
+                    f'<img src="data:image/png;base64,{get_image_base64(str(logo_path))}" style="max-width: 200px; width: 100%; height: auto; cursor: pointer;"></a>',
+                    unsafe_allow_html=True
+                )
+        except:
+            pass
 
-# Subtítulo centrado debajo del logo
-st.markdown("""
-    <div style="text-align: center; margin-top: -0.8rem; margin-bottom: 0.8rem;">
-        <p style="font-size: 1.1rem; color: #666; margin: 0;">
-            Experimenta el Futuro de la Inteligencia Artificial
-        </p>
-    </div>
-""", unsafe_allow_html=True)
-
-st.markdown("---")
-
-# Verificar API Key
-# En Azure, las variables de entorno se configuran desde el portal
-# En local, se usa el archivo .env
-env_file = Path(".env")
-openai_key = os.getenv("OPENAI_API_KEY")
-
-if not env_file.exists() and not openai_key:
-    st.error("⚠️ No se encontró el archivo .env ni la variable de entorno OPENAI_API_KEY.")
+    # Subtítulo centrado debajo del logo
     st.markdown("""
-    **Para desarrollo local:**
-    - Copia `env_template` a `.env` y configura tu `OPENAI_API_KEY`
-    
-    **Para Azure:**
-    - Ve a Azure Portal → Tu Web App → **Configuration** → **Application settings**
-    - Agrega `OPENAI_API_KEY` con tu clave de OpenAI
+        <div style="text-align: center; margin-top: -0.8rem; margin-bottom: 0.8rem;">
+            <p style="font-size: 1.1rem; color: #666; margin: 0;">
+                Experimenta el Futuro de la Inteligencia Artificial
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    # Verificar API Key
+    # En Azure, las variables de entorno se configuran desde el portal
+    # En local, se usa el archivo .env
+    env_file = Path(".env")
+    openai_key = os.getenv("OPENAI_API_KEY")
+
+    if not env_file.exists() and not openai_key:
+        st.error("⚠️ No se encontró el archivo .env ni la variable de entorno OPENAI_API_KEY.")
+        st.markdown("""
+        **Para desarrollo local:**
+        - Copia `env_template` a `.env` y configura tu `OPENAI_API_KEY`
+        
+        **Para Azure:**
+        - Ve a Azure Portal → Tu Web App → **Configuration** → **Application settings**
+        - Agrega `OPENAI_API_KEY` con tu clave de OpenAI
+        """)
+        st.stop()
+
+    # Introducción
+    st.markdown("""
+    ### Bienvenido al Demo Interactivo de IA
+
+    Explora tres experiencias diferentes diseñadas para mostrar el poder de la inteligencia artificial 
+    aplicada a distintos contextos:
     """)
-    st.stop()
 
-# Introducción
-st.markdown("""
-### Bienvenido al Demo Interactivo de IA
+    # Columnas para las aplicaciones
+    col1, col2, col3 = st.columns(3)
 
-Explora tres experiencias diferentes diseñadas para mostrar el poder de la inteligencia artificial 
-aplicada a distintos contextos:
-""")
+    with col1:
+        st.markdown("""
+            <div class="app-card">
+                <h3>💼 Diagnóstico Empresarial</h3>
+                <p>Analiza tu negocio y descubre oportunidades de automatización personalizadas para tu empresa.</p>
+                <p style="color: #4CAF50; font-weight: 600; margin-top: 0.5rem;">✅ 100% Gratis</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        if st.button("🚀 Iniciar Diagnóstico", use_container_width=True, type="primary"):
+            if 'is_unified_app' in st.session_state:
+                # Modo unificado: navegar a la app
+                st.session_state.pagina_actual = 'diagnostico'
+                st.rerun()
+            else:
+                # Modo standalone: mostrar instrucciones
+                st.info("📱 Abriendo aplicación de Diagnóstico Empresarial...")
+                st.markdown("**Instrucciones:**")
+                st.code("streamlit run diagnostico/app.py --server.port 8502", language="bash")
+                st.markdown("O ejecuta en tu terminal el comando de arriba")
 
-# Columnas para las aplicaciones
-col1, col2, col3 = st.columns(3)
+    with col2:
+        st.markdown("""
+            <div class="app-card">
+                <h3>🦸 Generador de Superhéroes</h3>
+                <p>¡Conviértete en superhéroe! Con poderes, origen épico e imagen generada por IA.</p>
+                <p style="color: #4CAF50; font-weight: 600; margin-top: 0.5rem;">✅ 100% Gratis</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        if st.button("⚡ ¡Ser Superhéroe!", use_container_width=True, type="primary"):
+            if 'is_unified_app' in st.session_state:
+                # Modo unificado: navegar a la app
+                st.session_state.pagina_actual = 'gemelo'
+                st.rerun()
+            else:
+                # Modo standalone: mostrar instrucciones
+                st.info("📱 Abriendo Generador de Superhéroes...")
+                st.markdown("**Instrucciones:**")
+                st.code("streamlit run gemelo/app.py --server.port 8503", language="bash")
+                st.markdown("O ejecuta en tu terminal el comando de arriba")
 
-with col1:
+    with col3:
+        st.markdown("""
+            <div class="app-card">
+                <h3>🍝 Generador de Brainrot Italiano</h3>
+                <p>¡Crea memes absurdos con estilo italiano! Divertido y colorido para niños.</p>
+                <p style="color: #4CAF50; font-weight: 600; margin-top: 0.5rem;">✅ 100% Gratis</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        if st.button("🎨 ¡Crear Brainrot!", use_container_width=True, type="primary"):
+            if 'is_unified_app' in st.session_state:
+                # Modo unificado: navegar a la app
+                st.session_state.pagina_actual = 'brainrot'
+                st.rerun()
+            else:
+                # Modo standalone: mostrar instrucciones
+                st.info("📱 Abriendo Generador de Brainrot...")
+                st.markdown("**Instrucciones:**")
+                st.code("streamlit run brainrot/app.py --server.port 8506", language="bash")
+                st.markdown("O ejecuta en tu terminal el comando de arriba")
+
+    # JUEGO IA - COMENTADO (juego para niños deshabilitado temporalmente)
+    # with col3:
+    #     st.markdown("""
+    #         <div class="app-card">
+    #             <h3>🎮 Juego Visual IA</h3>
+    #             <p>¿Foto Real o IA? ¡Adivina qué imágenes son reales y cuáles hizo la computadora! Perfecto para niños.</p>
+    #         </div>
+    #     """, unsafe_allow_html=True)
+    #     
+    #     if st.button("🎯 Jugar Ahora", use_container_width=True, type="primary"):
+    #         if 'is_unified_app' in st.session_state:
+    #             # Modo unificado: navegar a la app
+    #             st.session_state.pagina_actual = 'juego'
+    #             st.rerun()
+    #         else:
+    #             # Modo standalone: mostrar instrucciones
+    #             st.info("📱 Abriendo Juego IA...")
+    #             st.markdown("**Instrucciones:**")
+    #             st.code("streamlit run juego/app.py --server.port 8504", language="bash")
+    #             st.markdown("O ejecuta en tu terminal el comando de arriba")
+
+    # Nueva sección: Inteligencia Natural
+    st.markdown("---")
+    st.markdown("### 🧠 Inteligencia Natural vs Artificial")
+
+    col4, col5, col6 = st.columns([1, 2, 1])
+
+    with col5:
+        st.markdown("""
+            <div class="app-card">
+                <h3>🧩 Juego de Lógica</h3>
+                <p>Demuestra tu inteligencia natural. Sin IA, solo tu mente resolviendo desafíos de lógica, patrones y matemáticas.</p>
+                <p style="color: #4CAF50; font-weight: 600; margin-top: 0.5rem;">✅ 100% Gratis</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        if st.button("🧠 ¡Demostrar Inteligencia!", use_container_width=True, type="primary"):
+            if 'is_unified_app' in st.session_state:
+                # Modo unificado: navegar a la app
+                st.session_state.pagina_actual = 'logica'
+                st.rerun()
+            else:
+                # Modo standalone: mostrar instrucciones
+                st.info("📱 Abriendo Juego de Lógica...")
+                st.markdown("**Instrucciones:**")
+                st.code("streamlit run logica/app.py --server.port 8505", language="bash")
+                st.markdown("O ejecuta en tu terminal el comando de arriba")
+
+    # Información adicional
+    st.markdown("---")
+
+    col_info1, col_info2 = st.columns(2)
+
+    with col_info1:
+        if 'is_unified_app' in st.session_state:
+            # Modo unificado (Azure/Cloud)
+            st.markdown("""
+            ### 📊 Acerca de este Demo
+            
+            Este sistema está diseñado para funcionar online, conectándose únicamente 
+            a la API de OpenAI para las inferencias. 
+            
+            **Ventajas:**
+            - ✅ Bajo costo operativo
+            - ✅ Control total de los datos
+            - ✅ Ideal para eventos presenciales
+            """)
+        else:
+            # Modo standalone (Local)
+            st.markdown("""
+            ### 📊 Acerca de este Demo
+            
+            Este sistema está diseñado para funcionar 100% localmente, conectándose únicamente 
+            a la API de OpenAI para las inferencias. 
+            
+            **Ventajas:**
+            - ✅ Bajo costo operativo
+            - ✅ Control total de los datos
+            - ✅ Sin dependencia de infraestructura cloud
+            - ✅ Ideal para eventos presenciales
+            """)
+
+    with col_info2:
+        if 'is_unified_app' in st.session_state:
+            # Modo unificado (Azure/Cloud) - Mostrar QR
+            st.markdown("""
+            ### 🌐 Acceso desde Otros Dispositivos
+            
+            Para permitir que otros usuarios accedan desde sus dispositivos:
+            
+            **Escanea el QR code con tu dispositivo móvil:** `aquí va el QR code`
+            """)
+        else:
+            # Modo standalone (Local) - Instrucciones de IP
+            st.markdown("""
+            ### 🌐 Acceso desde Otros Dispositivos
+            
+            Para permitir que otros usuarios accedan desde sus dispositivos:
+            
+            1. Encuentra tu IP local: `ifconfig` (Mac/Linux) o `ipconfig` (Windows)
+            2. Ejecuta con: `streamlit run main_menu.py --server.address 0.0.0.0`
+            3. Comparte la URL: `http://TU_IP:8501`
+            
+            **Ejemplo:** `http://192.168.0.10:8501`
+            """)
+
+    # Footer
     st.markdown("""
-        <div class="app-card">
-            <h3>💼 Diagnóstico Empresarial</h3>
-            <p>Analiza tu negocio y descubre oportunidades de automatización personalizadas para tu empresa.</p>
-            <p style="color: #4CAF50; font-weight: 600; margin-top: 0.5rem;">✅ 100% Gratis</p>
+        <div class="footer">
+            <p class="brand">
+                <a href="https://inapsis.com.ar" target="_blank" style="text-decoration: none; 
+                   background: linear-gradient(135deg, #8B7BC8 0%, #FF6B5A 100%);
+                   -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+                   background-clip: text; cursor: pointer;">
+                    Inapsis
+                </a>
+            </p>
+            <p style="font-size: 0.95rem; margin-top: 0.5rem;">Innovación aplicada a sistemas</p>
         </div>
     """, unsafe_allow_html=True)
-    
-    if st.button("🚀 Iniciar Diagnóstico", use_container_width=True, type="primary"):
-        if 'is_unified_app' in st.session_state:
-            # Modo unificado: navegar a la app
-            st.session_state.pagina_actual = 'diagnostico'
-            st.rerun()
-        else:
-            # Modo standalone: mostrar instrucciones
-            st.info("📱 Abriendo aplicación de Diagnóstico Empresarial...")
-            st.markdown("**Instrucciones:**")
-            st.code("streamlit run diagnostico/app.py --server.port 8502", language="bash")
-            st.markdown("O ejecuta en tu terminal el comando de arriba")
 
-with col2:
-    st.markdown("""
-        <div class="app-card">
-            <h3>🦸 Generador de Superhéroes</h3>
-            <p>¡Conviértete en superhéroe! Con poderes, origen épico e imagen generada por IA.</p>
-            <p style="color: #4CAF50; font-weight: 600; margin-top: 0.5rem;">✅ 100% Gratis</p>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    if st.button("⚡ ¡Ser Superhéroe!", use_container_width=True, type="primary"):
-        if 'is_unified_app' in st.session_state:
-            # Modo unificado: navegar a la app
-            st.session_state.pagina_actual = 'gemelo'
-            st.rerun()
-        else:
-            # Modo standalone: mostrar instrucciones
-            st.info("📱 Abriendo Generador de Superhéroes...")
-            st.markdown("**Instrucciones:**")
-            st.code("streamlit run gemelo/app.py --server.port 8503", language="bash")
-            st.markdown("O ejecuta en tu terminal el comando de arriba")
+    # Sidebar solo se usa en app_unificada.py, aquí no hace falta
 
-with col3:
-    st.markdown("""
-        <div class="app-card">
-            <h3>🍝 Generador de Brainrot Italiano</h3>
-            <p>¡Crea memes absurdos con estilo italiano! Divertido y colorido para niños.</p>
-            <p style="color: #4CAF50; font-weight: 600; margin-top: 0.5rem;">✅ 100% Gratis</p>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    if st.button("🎨 ¡Crear Brainrot!", use_container_width=True, type="primary"):
-        if 'is_unified_app' in st.session_state:
-            # Modo unificado: navegar a la app
-            st.session_state.pagina_actual = 'brainrot'
-            st.rerun()
-        else:
-            # Modo standalone: mostrar instrucciones
-            st.info("📱 Abriendo Generador de Brainrot...")
-            st.markdown("**Instrucciones:**")
-            st.code("streamlit run brainrot/app.py --server.port 8506", language="bash")
-            st.markdown("O ejecuta en tu terminal el comando de arriba")
-
-# JUEGO IA - COMENTADO (juego para niños deshabilitado temporalmente)
-# with col3:
-#     st.markdown("""
-#         <div class="app-card">
-#             <h3>🎮 Juego Visual IA</h3>
-#             <p>¿Foto Real o IA? ¡Adivina qué imágenes son reales y cuáles hizo la computadora! Perfecto para niños.</p>
-#         </div>
-#     """, unsafe_allow_html=True)
-#     
-#     if st.button("🎯 Jugar Ahora", use_container_width=True, type="primary"):
-#         if 'is_unified_app' in st.session_state:
-#             # Modo unificado: navegar a la app
-#             st.session_state.pagina_actual = 'juego'
-#             st.rerun()
-#         else:
-#             # Modo standalone: mostrar instrucciones
-#             st.info("📱 Abriendo Juego IA...")
-#             st.markdown("**Instrucciones:**")
-#             st.code("streamlit run juego/app.py --server.port 8504", language="bash")
-#             st.markdown("O ejecuta en tu terminal el comando de arriba")
-
-# Nueva sección: Inteligencia Natural
-st.markdown("---")
-st.markdown("### 🧠 Inteligencia Natural vs Artificial")
-
-col4, col5, col6 = st.columns([1, 2, 1])
-
-with col5:
-    st.markdown("""
-        <div class="app-card">
-            <h3>🧩 Juego de Lógica</h3>
-            <p>Demuestra tu inteligencia natural. Sin IA, solo tu mente resolviendo desafíos de lógica, patrones y matemáticas.</p>
-            <p style="color: #4CAF50; font-weight: 600; margin-top: 0.5rem;">✅ 100% Gratis</p>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    if st.button("🧠 ¡Demostrar Inteligencia!", use_container_width=True, type="primary"):
-        if 'is_unified_app' in st.session_state:
-            # Modo unificado: navegar a la app
-            st.session_state.pagina_actual = 'logica'
-            st.rerun()
-        else:
-            # Modo standalone: mostrar instrucciones
-            st.info("📱 Abriendo Juego de Lógica...")
-            st.markdown("**Instrucciones:**")
-            st.code("streamlit run logica/app.py --server.port 8505", language="bash")
-            st.markdown("O ejecuta en tu terminal el comando de arriba")
-
-# Información adicional
-st.markdown("---")
-
-col_info1, col_info2 = st.columns(2)
-
-with col_info1:
-    if 'is_unified_app' in st.session_state:
-        # Modo unificado (Azure/Cloud)
-        st.markdown("""
-        ### 📊 Acerca de este Demo
-        
-        Este sistema está diseñado para funcionar online, conectándose únicamente 
-        a la API de OpenAI para las inferencias. 
-        
-        **Ventajas:**
-        - ✅ Bajo costo operativo
-        - ✅ Control total de los datos
-        - ✅ Ideal para eventos presenciales
-        """)
-    else:
-        # Modo standalone (Local)
-        st.markdown("""
-        ### 📊 Acerca de este Demo
-        
-        Este sistema está diseñado para funcionar 100% localmente, conectándose únicamente 
-        a la API de OpenAI para las inferencias. 
-        
-        **Ventajas:**
-        - ✅ Bajo costo operativo
-        - ✅ Control total de los datos
-        - ✅ Sin dependencia de infraestructura cloud
-        - ✅ Ideal para eventos presenciales
-        """)
-
-with col_info2:
-    if 'is_unified_app' in st.session_state:
-        # Modo unificado (Azure/Cloud) - Mostrar QR
-        st.markdown("""
-        ### 🌐 Acceso desde Otros Dispositivos
-        
-        Para permitir que otros usuarios accedan desde sus dispositivos:
-        
-        **Escanea el QR code con tu dispositivo móvil:** `aquí va el QR code`
-        """)
-    else:
-        # Modo standalone (Local) - Instrucciones de IP
-        st.markdown("""
-        ### 🌐 Acceso desde Otros Dispositivos
-        
-        Para permitir que otros usuarios accedan desde sus dispositivos:
-        
-        1. Encuentra tu IP local: `ifconfig` (Mac/Linux) o `ipconfig` (Windows)
-        2. Ejecuta con: `streamlit run main_menu.py --server.address 0.0.0.0`
-        3. Comparte la URL: `http://TU_IP:8501`
-        
-        **Ejemplo:** `http://192.168.0.10:8501`
-        """)
-
-# Footer
-st.markdown("""
-    <div class="footer">
-        <p class="brand">
-            <a href="https://inapsis.com.ar" target="_blank" style="text-decoration: none; 
-               background: linear-gradient(135deg, #8B7BC8 0%, #FF6B5A 100%);
-               -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
-               background-clip: text; cursor: pointer;">
-                Inapsis
-            </a>
-        </p>
-        <p style="font-size: 0.95rem; margin-top: 0.5rem;">Innovación aplicada a sistemas</p>
-    </div>
-""", unsafe_allow_html=True)
-
-# Sidebar solo se usa en app_unificada.py, aquí no hace falta
+# Para ejecución standalone
+if __name__ == "__main__" or ('is_unified_app' not in st.session_state or 
+                               st.session_state.get('is_unified_app') is None):
+    # Configuración de página solo si no está en modo unificado
+    if 'is_unified_app' not in st.session_state:
+        st.set_page_config(
+            page_title="Inapsis IA - Portal de Eventos",
+            page_icon="🧠",
+            layout="wide",
+            initial_sidebar_state="collapsed"
+        )
+    run_main_menu()
 
